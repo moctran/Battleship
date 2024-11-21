@@ -1,7 +1,13 @@
 SOURCES += \
+    homescreen.cpp \
     initialscreen.cpp \
-    main.cpp
+    loginscreen.cpp \
+    main.cpp \
+    signupscreen.cpp
 QT += widgets
 
 HEADERS += \
-    initialscreen.h
+    homescreen.h \
+    initialscreen.h \
+    loginscreen.h \
+    signupscreen.h
