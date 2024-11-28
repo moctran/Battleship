@@ -2,25 +2,26 @@
 #define LOGINSCREEN_H
 
 #include <QWidget>
-#include <QPushButton>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QVBoxLayout>
-#include <QLabel>
 #include <QStackedWidget>
 
 class LoginScreen : public QWidget {
     Q_OBJECT
 
 public:
-    LoginScreen(QStackedWidget *stackedWidget, QWidget *parent = nullptr);
+    explicit LoginScreen(QStackedWidget *stackedWidget, QWidget *parent = nullptr);
 
 private slots:
     void onLoginButtonClicked();
+    void onBackButtonClicked();
 
 private:
     QLineEdit *usernameInput;
     QLineEdit *passwordInput;
     QPushButton *loginButton;
+    QPushButton *backButton; // Declare the back button here
     QVBoxLayout *layout;
     QStackedWidget *stackedWidget;
 };

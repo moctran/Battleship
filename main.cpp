@@ -5,6 +5,9 @@
 #include "homescreen.h"
 #include "joingameroom.h"
 #include "creategameroom.h"
+#include "historyscreen.h"
+#include <QString>
+QString globalUserToken;
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -17,6 +20,7 @@ int main(int argc, char *argv[]) {
     SignUpScreen *signUpScreen = new SignUpScreen(&stackedWidget);
     HomeScreen *homeScreen = new HomeScreen(&stackedWidget);
     JoinGameRoom *joinGameRoom = new JoinGameRoom(&stackedWidget);
+    HistoryScreen *historyScreen = new HistoryScreen(&stackedWidget, globalUserToken);
 
     CreateGameRoom *createGameRoom = new CreateGameRoom(&stackedWidget);
 
@@ -26,8 +30,9 @@ int main(int argc, char *argv[]) {
     stackedWidget.addWidget(signUpScreen);  // Index 2
     stackedWidget.addWidget(homeScreen);    // Index 3
     stackedWidget.addWidget(joinGameRoom);  // Index 4
-    stackedWidget.addWidget(createGameRoom); // Add CreateGameRoom screen at index 5
+    stackedWidget.addWidget(createGameRoom); // Index 5
 
+    stackedWidget.addWidget(historyScreen); // Add History Screen at an appropriate index (6)
     stackedWidget.setCurrentWidget(initialScreen);
     stackedWidget.show();
 

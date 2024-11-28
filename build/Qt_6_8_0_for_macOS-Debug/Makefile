@@ -14,10 +14,10 @@ EQ            = =
 
 CC            = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang
 CXX           = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
-DEFINES       = -DQT_QML_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_QML_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g $(EXPORT_ARCH_ARGS) -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk -mmacosx-version-min=12.0 -Wall -Wextra $(DEFINES)
 CXXFLAGS      = -pipe -stdlib=libc++ -g -std=gnu++1z $(EXPORT_ARCH_ARGS) -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk -mmacosx-version-min=12.0 -Wall -Wextra $(DEFINES)
-INCPATH       = -I../../../BattleShipTest -I. -I../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I../../../Qt/6.8.0/macos/lib/QtGui.framework/Headers -I../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/System/Library/Frameworks/AGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/System/Library/Frameworks/AGL.framework/Headers -I../../../Qt/6.8.0/macos/mkspecs/macx-clang -F/Users/moctran/Qt/6.8.0/macos/lib
+INCPATH       = -I../../../BattleShipTest -I. -I../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I../../../Qt/6.8.0/macos/lib/QtGui.framework/Headers -I../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/System/Library/Frameworks/AGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/System/Library/Frameworks/AGL.framework/Headers -I../../../Qt/6.8.0/macos/mkspecs/macx-clang -F/Users/moctran/Qt/6.8.0/macos/lib
 QMAKE         = /Users/moctran/Qt/6.8.0/macos/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = BattleShipTest1.0.0
 DISTDIR = /Users/moctran/BattleShipTest/build/Qt_6_8_0_for_macOS-Debug/.tmp/BattleShipTest1.0.0
 LINK          = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
 LFLAGS        = -stdlib=libc++ -headerpad_max_install_names $(EXPORT_ARCH_ARGS) -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk -mmacosx-version-min=12.0 -Wl,-rpath,@executable_path/../Frameworks -Wl,-rpath,/Users/moctran/Qt/6.8.0/macos/lib
-LIBS          = $(SUBLIBS) -F/Users/moctran/Qt/6.8.0/macos/lib -framework QtWidgets -framework QtGui -framework AppKit -framework ImageIO -framework Metal -framework QtCore -framework IOKit -framework DiskArbitration -framework UniformTypeIdentifiers -framework AGL -framework OpenGL   
+LIBS          = $(SUBLIBS) -F/Users/moctran/Qt/6.8.0/macos/lib -framework QtWidgets -framework QtGui -framework AppKit -framework ImageIO -framework Metal -framework QtNetwork -framework QtCore -framework IOKit -framework DiskArbitration -framework UniformTypeIdentifiers -framework AGL -framework OpenGL   
 AR            = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar cq
 RANLIB        = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib -s
 SED           = sed
@@ -53,18 +53,21 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../../creategameroom.cpp \
+		../../historyscreen.cpp \
 		../../homescreen.cpp \
 		../../initialscreen.cpp \
 		../../joingameroom.cpp \
 		../../loginscreen.cpp \
 		../../main.cpp \
 		../../signupscreen.cpp moc_creategameroom.cpp \
+		moc_historyscreen.cpp \
 		moc_homescreen.cpp \
 		moc_initialscreen.cpp \
 		moc_joingameroom.cpp \
 		moc_loginscreen.cpp \
 		moc_signupscreen.cpp
 OBJECTS       = creategameroom.o \
+		historyscreen.o \
 		homescreen.o \
 		initialscreen.o \
 		joingameroom.o \
@@ -72,6 +75,7 @@ OBJECTS       = creategameroom.o \
 		main.o \
 		signupscreen.o \
 		moc_creategameroom.o \
+		moc_historyscreen.o \
 		moc_homescreen.o \
 		moc_initialscreen.o \
 		moc_joingameroom.o \
@@ -289,11 +293,13 @@ DIST          = /Qt/6.8.0/macos/mkspecs/features/spec_pre.prf \
 		/Qt/6.8.0/macos/mkspecs/features/yacc.prf \
 		/Qt/6.8.0/macos/mkspecs/features/lex.prf \
 		../../../../BattleShipTest.pro ../../creategameroom.h \
+		../../historyscreen.h \
 		../../homescreen.h \
 		../../initialscreen.h \
 		../../joingameroom.h \
 		../../loginscreen.h \
 		../../signupscreen.h ../../creategameroom.cpp \
+		../../historyscreen.cpp \
 		../../homescreen.cpp \
 		../../initialscreen.cpp \
 		../../joingameroom.cpp \
@@ -538,6 +544,7 @@ Makefile: ../../BattleShipTest.pro ../../../Qt/6.8.0/macos/mkspecs/features/spec
 		../../BattleShipTest.pro \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Resources/QtWidgets.prl \
 		../../../Qt/6.8.0/macos/lib/QtGui.framework/Resources/QtGui.prl \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Resources/QtNetwork.prl \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Resources/QtCore.prl
 	$(QMAKE) -o Makefile ../../BattleShipTest.pro -spec macx-clang CONFIG+=debug CONFIG+=qml_debug
 ../../../Qt/6.8.0/macos/mkspecs/features/spec_pre.prf:
@@ -754,6 +761,7 @@ Makefile: ../../BattleShipTest.pro ../../../Qt/6.8.0/macos/mkspecs/features/spec
 ../../BattleShipTest.pro:
 ../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Resources/QtWidgets.prl:
 ../../../Qt/6.8.0/macos/lib/QtGui.framework/Resources/QtGui.prl:
+../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Resources/QtNetwork.prl:
 ../../../Qt/6.8.0/macos/lib/QtCore.framework/Resources/QtCore.prl:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ../../BattleShipTest.pro -spec macx-clang CONFIG+=debug CONFIG+=qml_debug
@@ -779,8 +787,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../../creategameroom.h ../../homescreen.h ../../initialscreen.h ../../joingameroom.h ../../loginscreen.h ../../signupscreen.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../creategameroom.cpp ../../homescreen.cpp ../../initialscreen.cpp ../../joingameroom.cpp ../../loginscreen.cpp ../../main.cpp ../../signupscreen.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../creategameroom.h ../../historyscreen.h ../../homescreen.h ../../initialscreen.h ../../joingameroom.h ../../loginscreen.h ../../signupscreen.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../creategameroom.cpp ../../historyscreen.cpp ../../homescreen.cpp ../../initialscreen.cpp ../../joingameroom.cpp ../../loginscreen.cpp ../../main.cpp ../../signupscreen.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -809,9 +817,9 @@ benchmark: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_creategameroom.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp
+compiler_moc_header_make_all: moc_creategameroom.cpp moc_historyscreen.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_creategameroom.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp
+	-$(DEL_FILE) moc_creategameroom.cpp moc_historyscreen.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp
 moc_creategameroom.cpp: ../../creategameroom.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
@@ -829,7 +837,25 @@ moc_creategameroom.cpp: ../../creategameroom.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
 		../../../Qt/6.8.0/macos/libexec/moc
-	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../creategameroom.h -o moc_creategameroom.cpp
+	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../creategameroom.h -o moc_creategameroom.cpp
+
+moc_historyscreen.cpp: ../../historyscreen.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QVBoxLayout \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qboxlayout.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QListWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlistwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		../../../Qt/6.8.0/macos/libexec/moc
+	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../historyscreen.h -o moc_historyscreen.cpp
 
 moc_homescreen.cpp: ../../homescreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
@@ -843,7 +869,7 @@ moc_homescreen.cpp: ../../homescreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
 		../../../Qt/6.8.0/macos/libexec/moc
-	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../homescreen.h -o moc_homescreen.cpp
+	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../homescreen.h -o moc_homescreen.cpp
 
 moc_initialscreen.cpp: ../../initialscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
@@ -857,11 +883,9 @@ moc_initialscreen.cpp: ../../initialscreen.h \
 		../../loginscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLineEdit \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlineedit.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
 		../../signupscreen.h \
 		../../../Qt/6.8.0/macos/libexec/moc
-	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../initialscreen.h -o moc_initialscreen.cpp
+	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../initialscreen.h -o moc_initialscreen.cpp
 
 moc_joingameroom.cpp: ../../joingameroom.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
@@ -877,39 +901,35 @@ moc_joingameroom.cpp: ../../joingameroom.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
 		../../../Qt/6.8.0/macos/libexec/moc
-	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../joingameroom.h -o moc_joingameroom.cpp
+	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../joingameroom.h -o moc_joingameroom.cpp
 
 moc_loginscreen.cpp: ../../loginscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLineEdit \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlineedit.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QVBoxLayout \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qboxlayout.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
 		../../../Qt/6.8.0/macos/libexec/moc
-	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../loginscreen.h -o moc_loginscreen.cpp
+	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../loginscreen.h -o moc_loginscreen.cpp
 
 moc_signupscreen.cpp: ../../signupscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLineEdit \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlineedit.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QVBoxLayout \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qboxlayout.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
 		../../../Qt/6.8.0/macos/libexec/moc
-	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../signupscreen.h -o moc_signupscreen.cpp
+	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../signupscreen.h -o moc_signupscreen.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -951,6 +971,33 @@ creategameroom.o: ../../creategameroom.cpp ../../creategameroom.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qmessagebox.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o creategameroom.o ../../creategameroom.cpp
 
+historyscreen.o: ../../historyscreen.cpp ../../historyscreen.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QVBoxLayout \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qboxlayout.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QListWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlistwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonDocument \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsondocument.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonObject \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsonobject.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonArray \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsonarray.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QMessageBox \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qmessagebox.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QDebug \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qdebug.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o historyscreen.o ../../historyscreen.cpp
+
 homescreen.o: ../../homescreen.cpp ../../homescreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
@@ -962,6 +1009,11 @@ homescreen.o: ../../homescreen.cpp ../../homescreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
+		../../historyscreen.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QListWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlistwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QDebug \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qdebug.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o homescreen.o ../../homescreen.cpp
@@ -978,8 +1030,6 @@ initialscreen.o: ../../initialscreen.cpp ../../initialscreen.h \
 		../../loginscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLineEdit \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlineedit.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
 		../../signupscreen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o initialscreen.o ../../initialscreen.cpp
 
@@ -1003,20 +1053,24 @@ joingameroom.o: ../../joingameroom.cpp ../../joingameroom.h \
 loginscreen.o: ../../loginscreen.cpp ../../loginscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLineEdit \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlineedit.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QVBoxLayout \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qboxlayout.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
-		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QDebug \
-		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qdebug.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QMessageBox \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qmessagebox.h
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qmessagebox.h \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonDocument \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsondocument.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonObject \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsonobject.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o loginscreen.o ../../loginscreen.cpp
 
 main.o: ../../main.cpp ../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QApplication \
@@ -1033,36 +1087,50 @@ main.o: ../../main.cpp ../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/Q
 		../../loginscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLineEdit \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlineedit.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
 		../../signupscreen.h \
 		../../homescreen.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
 		../../joingameroom.h \
 		../../creategameroom.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QHBoxLayout \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QListWidget \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlistwidget.h
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlistwidget.h \
+		../../historyscreen.h \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QString \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qstring.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../main.cpp
 
 signupscreen.o: ../../signupscreen.cpp ../../signupscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLineEdit \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlineedit.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QVBoxLayout \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qboxlayout.h \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
-		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QDebug \
-		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qdebug.h
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QMessageBox \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qmessagebox.h \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonDocument \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsondocument.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonObject \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsonobject.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o signupscreen.o ../../signupscreen.cpp
 
 moc_creategameroom.o: moc_creategameroom.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_creategameroom.o moc_creategameroom.cpp
+
+moc_historyscreen.o: moc_historyscreen.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_historyscreen.o moc_historyscreen.cpp
 
 moc_homescreen.o: moc_homescreen.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_homescreen.o moc_homescreen.cpp

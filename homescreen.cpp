@@ -1,5 +1,7 @@
 #include "homescreen.h"
+#include "historyscreen.h"
 #include <QDebug>
+extern QString globalUserToken;
 
 HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     : QWidget(parent), stackedWidget(stackedWidget) {
@@ -39,7 +41,12 @@ void HomeScreen::onLeaderboardClicked() {
 }
 
 void HomeScreen::onHistoryClicked() {
-    qDebug() << "History clicked.";
+    HistoryScreen *historyScreen = dynamic_cast<HistoryScreen *>(stackedWidget->widget(6)); // Index 6
+    if (historyScreen) {
+        historyScreen->setToken(globalUserToken); // Pass the token dynamically
+        historyScreen->loadHistory();            // Trigger fetching history
+    }
+    stackedWidget->setCurrentIndex(6); //
 }
 
 void HomeScreen::onLogOutClicked() {
