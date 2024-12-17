@@ -47,6 +47,8 @@ void SignUpScreen::onSignUpButtonClicked() {
         return;
     }
 
+
+    // Prepare the sign-up request
     QJsonObject json;
     json["type"] = "signup";
     json["username"] = username;
@@ -84,7 +86,8 @@ void SignUpScreen::onSignUpButtonClicked() {
         QMessageBox::critical(this, "Sign Up Failed", errorMessage);
     }
 
-    socket.close();
+    // Optionally, you can choose to close the socket here if no longer needed
+    // socket->close();
 }
 
 void SignUpScreen::onBackButtonClicked() {

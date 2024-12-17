@@ -9,12 +9,17 @@
 #include <QLabel>
 #include <QListWidget>
 #include <QStackedWidget>
+#include <QTcpSocket>
 
 class CreateGameRoom : public QWidget {
     Q_OBJECT
 
 public:
-    CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent = nullptr);
+    explicit CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent = nullptr);
+    void setToken(const QString &newToken); // Set token dynamically
+    QString generateRoomID();     // Function to generate a random Room ID
+    void setRoomID(const QString &roomId);
+    void displayRoomID();
 
 private slots:
     void onStartGameClicked();
@@ -30,9 +35,9 @@ private:
     QListWidget *onlinePlayersList;
     QVBoxLayout *mainLayout;
     QStackedWidget *stackedWidget;
-
+    QString token;
+    QString roomID;
     void populateOnlinePlayers(); // Function to populate online players list
-    QString generateRoomID();     // Function to generate a random Room ID
 };
 
 #endif // CREATEGAMEROOM_H
