@@ -1,4 +1,5 @@
 #include "creategameroom.h"
+#include "battleshipboard.h"
 #include <QMessageBox>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -48,10 +49,16 @@ CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     connect(backButton, &QPushButton::clicked, this, &CreateGameRoom::onBackClicked);
 }
 
+// Redirect to set up ship screen
 void CreateGameRoom::onStartGameClicked() {
-    QMessageBox::information(this, "Start Game", "Starting the game...");
+    QMessageBox::information(this, "Game preparation", "Redirect to ship set up screen...");
+
+    BattleshipBoard *setupBoard = dynamic_cast<BattleshipBoard *>(stackedWidget->widget(7)); // Index 5
+    if (setupBoard) {
+        setupBoard->setToken(globalUserToken); // Pass the token dynamically
+    }
+
     stackedWidget->setCurrentIndex(7);
-    // Add actual game logic here
 }
 
 void CreateGameRoom::setToken(const QString &newToken) {
@@ -164,7 +171,7 @@ QString CreateGameRoom::generateRoomID() {
         return roomId;
     } else {
         QMessageBox::critical(this, "Error", message);
-        return QString();
+        return QString() = "failed";
     }
 }
 

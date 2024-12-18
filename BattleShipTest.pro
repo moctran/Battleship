@@ -1,6 +1,7 @@
 SOURCES += \
     battleshipboard.cpp \
     creategameroom.cpp \
+    gameboard.cpp \
     historyscreen.cpp \
     homescreen.cpp \
     initialscreen.cpp \
@@ -14,6 +15,7 @@ QT += network
 HEADERS += \
     battleshipboard.h \
     creategameroom.h \
+    gameboard.h \
     historyscreen.h \
     homescreen.h \
     initialscreen.h \
