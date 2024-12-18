@@ -10,6 +10,7 @@ SOURCES += \
     signupscreen.cpp
 QT += widgets
 QT += network
+QT += core gui widgets
 
 HEADERS += \
     battleshipboard.h \
