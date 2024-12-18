@@ -3,8 +3,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLabel>
+#include <SocketManager.h>
 
 extern QString globalUserToken;
+
 
 LoginScreen::LoginScreen(QStackedWidget *stackedWidget, QWidget *parent)
     : QWidget(parent), stackedWidget(stackedWidget) {
@@ -40,10 +42,13 @@ void LoginScreen::onLoginButtonClicked() {
         return;
     }
 
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 8080);
+    // Use SocketManager for persistent connection
+    auto socketManager = SocketManager::getInstance();
+    socketManager->connectToServer("127.0.0.1", 8080);
+    // socketManager->printSocketInfo();
+    auto socket = SocketManager::getInstance()->getSocket();
 
-    if (!socket.waitForConnected(3000)) {
+    if (!socket->waitForConnected(3000)) {
         QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
         return;
     }
@@ -55,19 +60,19 @@ void LoginScreen::onLoginButtonClicked() {
 
     QJsonDocument doc(json);
     QByteArray data = doc.toJson();
-    socket.write(data);
+    socket->write(data);
 
-    if (!socket.waitForBytesWritten(3000)) {
+    if (!socket->waitForBytesWritten(3000)) {
         QMessageBox::critical(this, "Error", "Failed to send data to the server.");
         return;
     }
 
-    if (!socket.waitForReadyRead(3000)) {
+    if (!socket->waitForReadyRead(3000)) {
         QMessageBox::critical(this, "Error", "No response from the server.");
         return;
     }
 
-    QByteArray responseData = socket.readAll();
+    QByteArray responseData = socket->readAll();
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
@@ -85,7 +90,27 @@ void LoginScreen::onLoginButtonClicked() {
         QMessageBox::critical(this, "Login Failed", errorMessage);
     }
 
-    socket.close();
+    // // Use SocketManager for persistent connection
+    // auto socketManager = SocketManager::getInstance();
+    // socketManager->connectToServer("127.0.0.1", 8080);
+
+    // // Subscribe to notifications
+    // QTcpSocket* socket = socketManager->getSocket();
+    // QJsonObject subscribeJson;
+    // subscribeJson["type"] = "subscribe_notification";
+    // subscribeJson["token"] = globalUserToken;
+
+    // QJsonDocument subscribeDoc(subscribeJson);
+    // QByteArray subscribeData = subscribeDoc.toJson();
+    // socket->write(subscribeData);
+
+    // if (!socket->waitForBytesWritten(3000)) {
+    //     QMessageBox::critical(this, "Error", "Failed to subscribe to notifications.");
+    //     return;
+    // }
+
+    // qDebug() << "Subscription to notifications sent successfully.";
+    socketManager->printSocketInfo();
 }
 
 void LoginScreen::onBackButtonClicked() {

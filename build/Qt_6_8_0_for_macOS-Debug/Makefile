@@ -60,14 +60,16 @@ SOURCES       = ../../battleshipboard.cpp \
 		../../joingameroom.cpp \
 		../../loginscreen.cpp \
 		../../main.cpp \
-		../../signupscreen.cpp moc_battleshipboard.cpp \
+		../../signupscreen.cpp \
+		../../socketmanager.cpp moc_battleshipboard.cpp \
 		moc_creategameroom.cpp \
 		moc_historyscreen.cpp \
 		moc_homescreen.cpp \
 		moc_initialscreen.cpp \
 		moc_joingameroom.cpp \
 		moc_loginscreen.cpp \
-		moc_signupscreen.cpp
+		moc_signupscreen.cpp \
+		moc_socketmanager.cpp
 OBJECTS       = battleshipboard.o \
 		creategameroom.o \
 		historyscreen.o \
@@ -77,6 +79,7 @@ OBJECTS       = battleshipboard.o \
 		loginscreen.o \
 		main.o \
 		signupscreen.o \
+		socketmanager.o \
 		moc_battleshipboard.o \
 		moc_creategameroom.o \
 		moc_historyscreen.o \
@@ -84,7 +87,8 @@ OBJECTS       = battleshipboard.o \
 		moc_initialscreen.o \
 		moc_joingameroom.o \
 		moc_loginscreen.o \
-		moc_signupscreen.o
+		moc_signupscreen.o \
+		moc_socketmanager.o
 DIST          = /Qt/6.8.0/macos/mkspecs/features/spec_pre.prf \
 		/Qt/6.8.0/macos/mkspecs/features/device_config.prf \
 		/Qt/6.8.0/macos/mkspecs/common/unix.conf \
@@ -303,7 +307,8 @@ DIST          = /Qt/6.8.0/macos/mkspecs/features/spec_pre.prf \
 		../../initialscreen.h \
 		../../joingameroom.h \
 		../../loginscreen.h \
-		../../signupscreen.h ../../battleshipboard.cpp \
+		../../signupscreen.h \
+		../../socketmanager.h ../../battleshipboard.cpp \
 		../../creategameroom.cpp \
 		../../historyscreen.cpp \
 		../../homescreen.cpp \
@@ -311,7 +316,8 @@ DIST          = /Qt/6.8.0/macos/mkspecs/features/spec_pre.prf \
 		../../joingameroom.cpp \
 		../../loginscreen.cpp \
 		../../main.cpp \
-		../../signupscreen.cpp
+		../../signupscreen.cpp \
+		../../socketmanager.cpp
 QMAKE_TARGET  = BattleShipTest
 DESTDIR       = 
 TARGET        = BattleShipTest.app/Contents/MacOS/BattleShipTest
@@ -793,8 +799,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../../battleshipboard.h ../../creategameroom.h ../../historyscreen.h ../../homescreen.h ../../initialscreen.h ../../joingameroom.h ../../loginscreen.h ../../signupscreen.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../battleshipboard.cpp ../../creategameroom.cpp ../../historyscreen.cpp ../../homescreen.cpp ../../initialscreen.cpp ../../joingameroom.cpp ../../loginscreen.cpp ../../main.cpp ../../signupscreen.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../battleshipboard.h ../../creategameroom.h ../../historyscreen.h ../../homescreen.h ../../initialscreen.h ../../joingameroom.h ../../loginscreen.h ../../signupscreen.h ../../socketmanager.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../battleshipboard.cpp ../../creategameroom.cpp ../../historyscreen.cpp ../../homescreen.cpp ../../initialscreen.cpp ../../joingameroom.cpp ../../loginscreen.cpp ../../main.cpp ../../signupscreen.cpp ../../socketmanager.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -823,9 +829,9 @@ benchmark: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_battleshipboard.cpp moc_creategameroom.cpp moc_historyscreen.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp
+compiler_moc_header_make_all: moc_battleshipboard.cpp moc_creategameroom.cpp moc_historyscreen.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp moc_socketmanager.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_battleshipboard.cpp moc_creategameroom.cpp moc_historyscreen.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp
+	-$(DEL_FILE) moc_battleshipboard.cpp moc_creategameroom.cpp moc_historyscreen.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp moc_socketmanager.cpp
 moc_battleshipboard.cpp: ../../battleshipboard.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
@@ -969,6 +975,16 @@ moc_signupscreen.cpp: ../../signupscreen.h \
 		../../../Qt/6.8.0/macos/libexec/moc
 	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../signupscreen.h -o moc_signupscreen.cpp
 
+moc_socketmanager.cpp: ../../socketmanager.h \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QObject \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qobject.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QString \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qstring.h \
+		../../../Qt/6.8.0/macos/libexec/moc
+	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../socketmanager.h -o moc_socketmanager.cpp
+
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
@@ -1104,7 +1120,12 @@ homescreen.o: ../../homescreen.cpp ../../homescreen.h \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonObject \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsonobject.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QApplication \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qapplication.h
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qapplication.h \
+		../../socketmanager.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QObject \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qobject.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QString \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qstring.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o homescreen.o ../../homescreen.cpp
 
 initialscreen.o: ../../initialscreen.cpp ../../initialscreen.h \
@@ -1161,7 +1182,12 @@ loginscreen.o: ../../loginscreen.cpp ../../loginscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonObject \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsonobject.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
+		../../SocketManager.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QObject \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qobject.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QString \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qstring.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o loginscreen.o ../../loginscreen.cpp
 
 main.o: ../../main.cpp ../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QApplication \
@@ -1229,6 +1255,17 @@ signupscreen.o: ../../signupscreen.cpp ../../signupscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o signupscreen.o ../../signupscreen.cpp
 
+socketmanager.o: ../../socketmanager.cpp ../../SocketManager.h \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		../../../Qt/6.8.0/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QObject \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qobject.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QString \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qstring.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QDebug \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qdebug.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o socketmanager.o ../../socketmanager.cpp
+
 moc_battleshipboard.o: moc_battleshipboard.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_battleshipboard.o moc_battleshipboard.cpp
 
@@ -1252,6 +1289,9 @@ moc_loginscreen.o: moc_loginscreen.cpp
 
 moc_signupscreen.o: moc_signupscreen.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_signupscreen.o moc_signupscreen.cpp
+
+moc_socketmanager.o: moc_socketmanager.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_socketmanager.o moc_socketmanager.cpp
 
 ####### Install
 
