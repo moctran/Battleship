@@ -45,13 +45,19 @@ void HomeScreen::onCreateGameRoomClicked() {
     if (createGameRoom) {
         createGameRoom->setToken(globalUserToken); // Pass the token dynamically
         QString roomId = createGameRoom->generateRoomID();
+
+        if (roomId.isEmpty() || roomId == "failed") {
+            qDebug() << "Room ID generation failed. Cannot create game room.";
+            return; // Stop further processing
+        }
+
         qDebug() << "Generated Room ID: " << roomId;
         createGameRoom->setRoomID(roomId);
         createGameRoom->displayRoomID();
-    }
-    stackedWidget->setCurrentIndex(5); // Navigate to Create Game Room Screen
 
-    stackedWidget->setCurrentIndex(5); // Navigate to Create Game Room Screen
+        // Navigate to Create Game Room Screen only if RoomID generation succeeds
+        stackedWidget->setCurrentIndex(5);
+    }
 }
 
 void HomeScreen::onLeaderboardClicked() {

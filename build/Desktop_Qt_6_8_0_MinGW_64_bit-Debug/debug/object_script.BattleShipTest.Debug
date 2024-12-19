@@ -1,5 +1,6 @@
 debug/battleshipboard.o
 debug/creategameroom.o
+debug/gameboard.o
 debug/historyscreen.o
 debug/homescreen.o
 debug/initialscreen.o
@@ -9,6 +10,7 @@ debug/main.o
 debug/signupscreen.o
 debug/moc_battleshipboard.o
 debug/moc_creategameroom.o
+debug/moc_gameboard.o
 debug/moc_historyscreen.o
 debug/moc_homescreen.o
 debug/moc_initialscreen.o

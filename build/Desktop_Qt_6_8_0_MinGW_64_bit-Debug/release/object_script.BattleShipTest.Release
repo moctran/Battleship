@@ -1,5 +1,6 @@
 release/battleshipboard.o
 release/creategameroom.o
+release/gameboard.o
 release/historyscreen.o
 release/homescreen.o
 release/initialscreen.o
@@ -9,6 +10,7 @@ release/main.o
 release/signupscreen.o
 release/moc_battleshipboard.o
 release/moc_creategameroom.o
+release/moc_gameboard.o
 release/moc_historyscreen.o
 release/moc_homescreen.o
 release/moc_initialscreen.o
