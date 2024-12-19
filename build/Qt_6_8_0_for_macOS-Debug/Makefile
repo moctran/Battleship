@@ -1120,12 +1120,7 @@ homescreen.o: ../../homescreen.cpp ../../homescreen.h \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonObject \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsonobject.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QApplication \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qapplication.h \
-		../../socketmanager.h \
-		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QObject \
-		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qobject.h \
-		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QString \
-		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qstring.h
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qapplication.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o homescreen.o ../../homescreen.cpp
 
 initialscreen.o: ../../initialscreen.cpp ../../initialscreen.h \

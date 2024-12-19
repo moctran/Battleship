@@ -1,6 +1,6 @@
-// SocketManager.cpp
 #include "SocketManager.h"
 #include <QDebug>
+
 SocketManager* SocketManager::instance = nullptr;
 
 SocketManager::SocketManager() {
@@ -10,6 +10,7 @@ SocketManager::SocketManager() {
     connect(socket, &QTcpSocket::disconnected, this, &SocketManager::onDisconnected);
     connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::errorOccurred),
             this, &SocketManager::onError);
+    connect(socket, &QTcpSocket::readyRead, this, &SocketManager::onReadyRead); // Listen for incoming data
 }
 
 SocketManager::~SocketManager() {
@@ -40,18 +41,31 @@ void SocketManager::disconnectFromServer() {
 }
 
 void SocketManager::onConnected() {
+    qDebug() << "Socket connected to server.";
     emit connectionEstablished();
 }
 
 void SocketManager::onDisconnected() {
+    qDebug() << "Socket disconnected from server.";
     emit connectionLost();
 }
 
 void SocketManager::onError(QAbstractSocket::SocketError socketError) {
+    qDebug() << "Socket error:" << socket->errorString();
     emit errorOccurred(socket->errorString());
 }
 
+void SocketManager::onReadyRead() {
+    if (!socket) {
+        qDebug() << "Socket is not initialized.";
+        return;
+    }
 
+    QByteArray message = socket->readAll(); // Read all available data
+    qDebug() << "Message received from server:" << message;
+
+    emit messageReceived(message); // Emit the signal to notify listeners
+}
 
 void SocketManager::printSocketInfo() const {
     if (!socket) {

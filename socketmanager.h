@@ -1,4 +1,3 @@
-// SocketManager.h
 #ifndef SOCKETMANAGER_H
 #define SOCKETMANAGER_H
 
@@ -21,6 +20,7 @@ signals:
     void connectionEstablished();
     void connectionLost();
     void errorOccurred(const QString& error);
+    void messageReceived(const QByteArray& message); // Signal for received messages
 
 private:
     SocketManager();
@@ -32,6 +32,7 @@ private slots:
     void onConnected();
     void onDisconnected();
     void onError(QAbstractSocket::SocketError socketError);
+    void onReadyRead(); // Slot to handle incoming messages
 };
 
 #endif // SOCKETMANAGER_H

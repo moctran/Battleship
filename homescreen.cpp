@@ -8,7 +8,6 @@
 #include <QJsonObject>
 #include <QLabel>
 #include <QApplication>
-#include <socketmanager.h>
 
 extern QString globalUserToken;
 
@@ -75,10 +74,10 @@ void HomeScreen::onLogOutClicked() {
 
 
 void HomeScreen::HandleLoggedOut() {
-    auto socketManager = SocketManager::getInstance();
-    socketManager->printSocketInfo();
-    auto socket = SocketManager::getInstance()->getSocket();
-    if (!socket->waitForConnected(3000)) {
+    QTcpSocket socket;
+    socket.connectToHost("127.0.0.1", 8080);
+
+    if (!socket.waitForConnected(3000)) {
         QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
         return;
     }
@@ -89,26 +88,26 @@ void HomeScreen::HandleLoggedOut() {
     QJsonDocument doc(json);
     QByteArray data = doc.toJson();
 
-    if (socket->write(data) == -1) {
+    if (socket.write(data) == -1) {
         QMessageBox::critical(this, "Error", "Failed to send data to the server.");
         return;
     }
 
-    if (!socket->waitForBytesWritten(3000)) {
+    if (!socket.waitForBytesWritten(3000)) {
         QMessageBox::critical(this, "Error", "Failed to send data to the server.");
         return;
     }
 
-    if (!socket->waitForReadyRead(3000)) {
+    if (!socket.waitForReadyRead(3000)) {
         QMessageBox::critical(this, "Error", "No response from the server.");
         return;
     }
 
-    QByteArray responseData = socket->readAll();
+    QByteArray responseData = socket.readAll();
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
-    qDebug() << "Server response for view_profile:" << responseData;
+    qDebug() << "Server response for log_out:" << responseData;
 
     if (responseObj["status"].toString() == "success") {
         QMessageBox::information(this, "Logout Successful", "You have logged out from the game.");
