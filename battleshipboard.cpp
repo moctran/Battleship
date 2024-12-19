@@ -1,8 +1,7 @@
 #include "battleshipboard.h"
 #include "gameboard.h"
-#include <QMessageBox>
-#include <QDrag>
-#include <QDebug>
+
+#include <sstream>
 
 extern QString globalUserToken;
 
@@ -59,8 +58,8 @@ BattleshipBoard::BattleshipBoard(QStackedWidget *stackedWidget, QWidget *parent)
 }
 
 void BattleshipBoard::createBoard() {
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 8; ++col) {
+    for (int row = 0; row < 10; ++row) {
+        for (int col = 0; col < 10; ++col) {
             playerBoard[row][col] = new QPushButton();
             playerBoard[row][col]->setFixedSize(40, 40);
             playerBoard[row][col]->setStyleSheet("background-color: lightblue;");
@@ -137,8 +136,8 @@ void BattleshipBoard::setupShipsPanel(QVBoxLayout *centralPanel) {
 }
 
 void BattleshipBoard::resetBoardState() {
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 8; ++col) {
+    for (int row = 0; row < 10; ++row) {
+        for (int col = 0; col < 10; ++col) {
             playerBoard[row][col]->setStyleSheet("background-color: lightblue;");
             playerBoard[row][col]->setProperty("state", 0);
         }
@@ -173,8 +172,8 @@ void BattleshipBoard::dropEvent(QDropEvent *event) {
     if (!targetButton) return;
 
     int row = -1, col = -1;
-    for (int r = 0; r < 8; ++r) {
-        for (int c = 0; c < 8; ++c) {
+    for (int r = 0; r < 10; ++r) {
+        for (int c = 0; c < 10; ++c) {
             if (playerBoard[r][c] == targetButton) {
                 row = r;
                 col = c;
@@ -199,7 +198,7 @@ bool BattleshipBoard::canPlaceShip(int row, int col, int size, bool vertical) {
         int checkRow = vertical ? row + i : row;
         int checkCol = vertical ? col : col + i;
 
-        if (checkRow >= 8 || checkCol >= 8 || playerBoard[checkRow][checkCol]->property("state").toInt() != 0)
+        if (checkRow >= 10 || checkCol >= 10 || playerBoard[checkRow][checkCol]->property("state").toInt() != 0)
             return false;
     }
     return true;
@@ -242,17 +241,95 @@ void BattleshipBoard::onFinishSetupClicked() {
             return; // Stop further execution
         }
     }
+    saveBoardState();
     // If all ships are placed, proceed
     setupFinished = true;
     printBoardState();
     finishSetupButton->setDisabled(true);
+    // Submit arrangement to the server
+    submitArrangementToServer();
+}
+
+void BattleshipBoard::submitArrangementToServer() {
+    // Ensure the board state and token are valid
+    // if (savedBoardState.isEmpty() || token.isEmpty()) {
+    //     QMessageBox::critical(this, "Error", "Invalid board state or token.");
+    //     return;
+    // }
+
+    // Prepare the JSON request
+    QJsonObject requestJson;
+    requestJson["type"] = "submit_arrangement";
+    requestJson["token"] = token;
+
+    // Convert the 2D board state to a nested JSON array
+    QJsonArray shipsArray;
+    for (int i = 0; i < 10; ++i) {
+        QJsonArray rowArray;
+        for (int j = 0; j < 10; ++j) {
+            rowArray.append(savedBoardState[i][j]);
+        }
+        shipsArray.append(rowArray);
+    }
+
+    requestJson["ships"] = shipsArray;
+    // QJsonArray shipsArray;
+    // for (const QList<int> &row : savedBoardState) {
+    //     QJsonArray jsonRow;
+    //     for (int cell : row) {
+    //         qDebug() << cell << " ";
+    //         jsonRow.append(cell);
+    //     }
+    //     qDebug() << "\n";
+    //     shipsArray.append(jsonRow);
+    // }
+    QJsonDocument requestDoc(requestJson);
+    QByteArray requestData = requestDoc.toJson(QJsonDocument::Compact);
+
+    // Create a TCP socket
+    QTcpSocket socket;
+    socket.connectToHost("192.168.10.103", 8080);
+
+    // Check connection
+    if (!socket.waitForConnected(3000)) {
+        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
+        return;
+    }
+
+    // Send the request data
+    socket.write(requestData);
+
+    if (!socket.waitForBytesWritten(3000)) {
+        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
+        return;
+    }
+
+    // Wait for the server's response
+    if (!socket.waitForReadyRead(3000)) {
+        QMessageBox::critical(this, "Error", "No response from the server.");
+        return;
+    }
+
+    // Read and process the server's response
+    QByteArray responseData = socket.readAll();
+    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject responseObj = responseDoc.object();
+
+    QString status = responseObj["status"].toString();
+    QString message = responseObj["message"].toString();
+
+    if (status == "success") {
+        QMessageBox::information(this, "Success", "Board arrangement submitted successfully!");
+    } else {
+        QMessageBox::critical(this, "Error", "Failed to submit arrangement: " + message);
+    }
 }
 
 void BattleshipBoard::printBoardState() {
     qDebug() << "Final Board State:";
-    for (int row = 0; row < 8; ++row) {
+    for (int row = 0; row < 10; ++row) {
         QString line;
-        for (int col = 0; col < 8; ++col) {
+        for (int col = 0; col < 10; ++col) {
             line += QString::number(playerBoard[row][col]->property("state").toInt()) + " ";
         }
         qDebug() << line;
@@ -289,9 +366,9 @@ void BattleshipBoard::onPlayGameClicked() {
 // Save the board state
 void BattleshipBoard::saveBoardState() {
     savedBoardState.clear(); // Clear any previous saved state
-    for (int row = 0; row < 8; ++row) {
+    for (int row = 0; row < 10; ++row) {
         QList<int> rowState;
-        for (int col = 0; col < 8; ++col) {
+        for (int col = 0; col < 10; ++col) {
             rowState.append(playerBoard[row][col]->property("state").toInt());
         }
         savedBoardState.append(rowState);
@@ -311,5 +388,5 @@ void BattleshipBoard::saveBoardState() {
 // Set user's token here
 void BattleshipBoard::setToken(const QString &newToken) {
     token = newToken;
-    qDebug() << "Token set in CreateGameScreen:" << token;
+    qDebug() << "Token set in SetUpScreen:" << token;
 }

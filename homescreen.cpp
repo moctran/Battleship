@@ -19,6 +19,7 @@ HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     leaderboardButton = new QPushButton("Leaderboard", this);
     historyButton = new QPushButton("History", this);
     logOutButton = new QPushButton("Log Out", this);
+    testButton = new QPushButton("Test", this);
 
     layout = new QVBoxLayout(this);
     layout->addWidget(new QLabel("Home Screen", this));
@@ -27,6 +28,7 @@ HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     layout->addWidget(leaderboardButton);
     layout->addWidget(historyButton);
     layout->addWidget(logOutButton);
+    layout->addWidget(testButton);
     setLayout(layout);
 
     connect(joinGameRoomButton, &QPushButton::clicked, this, &HomeScreen::onJoinGameRoomClicked);
@@ -34,6 +36,7 @@ HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     connect(leaderboardButton, &QPushButton::clicked, this, &HomeScreen::onLeaderboardClicked);
     connect(historyButton, &QPushButton::clicked, this, &HomeScreen::onHistoryClicked);
     connect(logOutButton, &QPushButton::clicked, this, &HomeScreen::onLogOutClicked);
+    connect(testButton, &QPushButton::clicked, this, &HomeScreen::onTestClicked);
 }
 
 void HomeScreen::onJoinGameRoomClicked() {
@@ -80,7 +83,7 @@ void HomeScreen::onLogOutClicked() {
 
 void HomeScreen::HandleLoggedOut() {
     QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 8080);
+    socket.connectToHost("192.168.10.103", 8080);
 
     if (!socket.waitForConnected(3000)) {
         QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
@@ -121,6 +124,10 @@ void HomeScreen::HandleLoggedOut() {
         QString errorMessage = responseObj["message"].toString();
         QMessageBox::critical(this, "Logout Failed", errorMessage);
     }
+}
+
+void HomeScreen::onTestClicked() {
+    stackedWidget->setCurrentIndex(9); //
 }
 
 

@@ -13,6 +13,12 @@
 #include <QMimeData>
 #include <QList>
 #include <QPair>
+#include <QMessageBox>
+#include <QDrag>
+#include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 class BattleshipBoard : public QWidget {
     Q_OBJECT
@@ -27,7 +33,7 @@ protected:
 
 private:
     QGridLayout *playerLayout;
-    QPushButton *playerBoard[8][8];
+    QPushButton *playerBoard[10][10];
     QPushButton *returnButton;
     QPushButton *finishSetupButton;
     QPushButton *clearButton;
@@ -56,6 +62,7 @@ private:
     void onReturnButtonClicked();
     void onFinishSetupClicked();
     void onClearButtonClicked();
+    void submitArrangementToServer();
 };
 
 #endif // BATTLESHIPBOARD_H

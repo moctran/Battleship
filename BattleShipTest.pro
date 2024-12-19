@@ -8,8 +8,10 @@ SOURCES += \
     joingameroom.cpp \
     loginscreen.cpp \
     main.cpp \
+    networkmanager.cpp \
     signupscreen.cpp \
-    socketmanager.cpp
+    socketmanager.cpp \
+    testScreen.cpp
 QT += widgets
 QT += network
 QT += core gui widgets
@@ -23,5 +25,7 @@ HEADERS += \
     initialscreen.h \
     joingameroom.h \
     loginscreen.h \
+    networkmanager.h \
     signupscreen.h \
-    socketmanager.h
+    socketmanager.h \
+    testScreen.h

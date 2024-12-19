@@ -41,7 +41,7 @@ void LoginScreen::onLoginButtonClicked() {
     }
 
     QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 8080);
+    socket.connectToHost("192.168.10.103", 8080);
 
     if (!socket.waitForConnected(3000)) {
         QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");

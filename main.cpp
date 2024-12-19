@@ -9,10 +9,41 @@
 #include "battleshipboard.h"
 #include "gameboard.h"
 #include <QString>
+#include "networkmanager.h"
+#include "testScreen.h"
 QString globalUserToken;
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+
+    // Create NetworkManager instance
+    NetworkManager networkManager;
+
+    // Connect to localhost:8080
+    networkManager.connectToServer("192.168.10.103", 8080);
+
+    // Send subscription message once connected
+    QObject::connect(&networkManager, &NetworkManager::connectionEstablished, [&]() {
+        QJsonObject message;
+        message["type"] = "subcribe_notification";
+        message["token"] = "6569C395-A174-4616-B54E-80830C4144F5";
+        networkManager.sendMessage(message);
+    });
+
+    // Handle incoming data
+    QObject::connect(&networkManager, &NetworkManager::dataReceived, [](const QString &data) {
+        qDebug() << "Data received from server:" << data;
+
+        // Parse JSON data if needed
+        QJsonDocument doc = QJsonDocument::fromJson(data.toUtf8());
+        if (!doc.isNull() && doc.isObject()) {
+            QJsonObject obj = doc.object();
+            qDebug() << "Parsed JSON:" << obj;
+        } else {
+            qDebug() << "Received invalid JSON.";
+        }
+    });
+
 
     QStackedWidget stackedWidget;
 
@@ -28,7 +59,7 @@ int main(int argc, char *argv[]) {
 
     BattleshipBoard *setupgameBoard = new BattleshipBoard(&stackedWidget); // Set up board
     GameBoard *gameBoard = new GameBoard(&stackedWidget);
-
+    TestScreen *testScreen = new TestScreen(&stackedWidget);
     // Add screens to the stacked widget
     stackedWidget.addWidget(initialScreen); // Index 0
     stackedWidget.addWidget(loginScreen);   // Index 1
@@ -40,6 +71,7 @@ int main(int argc, char *argv[]) {
     stackedWidget.addWidget(historyScreen); // Add History Screen at an appropriate index (6)
     stackedWidget.addWidget(setupgameBoard); // Index 7
     stackedWidget.addWidget(gameBoard); // Index 8
+    stackedWidget.addWidget(testScreen); // Index 9
     stackedWidget.setCurrentWidget(initialScreen);
     stackedWidget.show();
 
