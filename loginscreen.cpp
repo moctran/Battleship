@@ -3,6 +3,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLabel>
+#include <socketmanager.h>
 
 extern QString globalUserToken;
 
@@ -84,8 +85,23 @@ void LoginScreen::onLoginButtonClicked() {
         QString errorMessage = responseObj["message"].toString();
         QMessageBox::critical(this, "Login Failed", errorMessage);
     }
-
     socket.close();
+
+    // Call the "subscribe_notification" API using SocketManager
+    SocketManager* socketManager = SocketManager::getInstance();
+    socketManager->connectToServer("127.0.0.1", 8080); // Ensure connection is established
+
+    QJsonObject subscribeJson;
+    subscribeJson["type"] = "subcribe_notification";
+    subscribeJson["token"] = globalUserToken;
+
+    QJsonDocument subscribeDoc(subscribeJson);
+    QByteArray subscribeData = subscribeDoc.toJson();
+    socketManager->getSocket()->write(subscribeData);
+    socketManager->getSocket()->flush();
+    socketManager->getInstance()->printSocketInfo();
+
+
 }
 
 void LoginScreen::onBackButtonClicked() {
