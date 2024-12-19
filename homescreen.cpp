@@ -1,6 +1,7 @@
 #include "homescreen.h"
 #include "historyscreen.h"
 #include "creategameroom.h"
+#include "joingameroom.h"
 #include <QMessageBox>
 #include <QDebug>
 #include <QTcpSocket>
@@ -40,6 +41,10 @@ HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
 }
 
 void HomeScreen::onJoinGameRoomClicked() {
+    JoinGameRoom *joinGameScreen = dynamic_cast<JoinGameRoom *>(stackedWidget->widget(4)); // Index 4
+    if (joinGameScreen) {
+        joinGameScreen->setToken(globalUserToken); // Pass the token dynamically
+    }
     stackedWidget->setCurrentIndex(4); // Navigate to Join Game Room Screen
 }
 
@@ -57,7 +62,7 @@ void HomeScreen::onCreateGameRoomClicked() {
         qDebug() << "Generated Room ID: " << roomId;
         createGameRoom->setRoomID(roomId);
         createGameRoom->displayRoomID();
-
+        createGameRoom->populateOnlinePlayers();
         // Navigate to Create Game Room Screen only if RoomID generation succeeds
         stackedWidget->setCurrentIndex(5);
     }

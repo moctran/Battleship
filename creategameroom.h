@@ -20,11 +20,21 @@ public:
     QString generateRoomID();     // Function to generate a random Room ID
     void setRoomID(const QString &roomId);
     void displayRoomID();
+    void displayPlayers(QString firstPlayerId, QString secondPlayerId);
+    struct Player {
+        QString id;
+        QString username;
+    };
+    void onSendButtonClicked(const QString &userId);
+    void populateOnlinePlayers(); // Function to populate online players list
+    void displayOnlinePlayers(std::vector<Player>& players);
+
 
 private slots:
     void onStartGameClicked();
     void onBackClicked();
     void onSendInviteClicked();
+    void onPlayerChanges(const QByteArray &message);
 
 private:
     QLabel *player1Label;
@@ -37,7 +47,6 @@ private:
     QStackedWidget *stackedWidget;
     QString token;
     QString roomID;
-    void populateOnlinePlayers(); // Function to populate online players list
 };
 
 #endif // CREATEGAMEROOM_H

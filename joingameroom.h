@@ -7,12 +7,17 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QStackedWidget>
+#include <QTcpSocket>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 class JoinGameRoom : public QWidget {
     Q_OBJECT
 
 public:
     JoinGameRoom(QStackedWidget *stackedWidget, QWidget *parent = nullptr);
+    void setToken(const QString &newToken); // Set token dynamically
 
 private slots:
     void onJoinRoomClicked();
@@ -24,6 +29,8 @@ private:
     QPushButton *backButton;
     QVBoxLayout *layout;
     QStackedWidget *stackedWidget;
+    QString token;
+    void redirect(QString firstPlayerId, QString secondPlayerId, QString roomID);
 };
 
 #endif // JOINGAMEROOM_H

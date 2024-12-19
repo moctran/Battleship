@@ -1,5 +1,6 @@
 #include "creategameroom.h"
 #include "battleshipboard.h"
+#include "socketmanager.h"
 #include <QMessageBox>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -47,6 +48,8 @@ CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     // Connect buttons
     connect(startGameButton, &QPushButton::clicked, this, &CreateGameRoom::onStartGameClicked);
     connect(backButton, &QPushButton::clicked, this, &CreateGameRoom::onBackClicked);
+    SocketManager* socketManager = SocketManager::getInstance();
+    connect(socketManager, &SocketManager::messageReceived, this, &CreateGameRoom::onPlayerChanges);
 }
 
 // Redirect to set up ship screen
@@ -72,7 +75,41 @@ void CreateGameRoom::setRoomID(const QString &roomId) {
 }
 
 void CreateGameRoom::onBackClicked() {
-    stackedWidget->setCurrentIndex(3); // Navigate back to Home Screen
+    QTcpSocket socket;
+    socket.connectToHost("192.168.10.103", 8080);
+
+    if (!socket.waitForConnected(3000)) {
+        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
+    }
+
+    // Prepare the request JSON
+    qDebug() << "Using token for leave_room request:" << token;
+
+    QJsonObject requestJson;
+    requestJson["type"] = "leave_room";
+    requestJson["token"] = token;
+
+    QJsonDocument requestDoc(requestJson);
+    QByteArray requestData = requestDoc.toJson();
+    socket.write(requestData);
+
+    // Wait for the server to acknowledge the request
+    if (!socket.waitForBytesWritten(3000)) {
+        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
+    }
+
+    // Wait for the server's response
+    if (!socket.waitForReadyRead(3000)) {
+        QMessageBox::critical(this, "Error", "No response from the server.");
+    }
+
+    // Process the response
+    QByteArray responseData = socket.readAll();
+    qDebug() << "Server response for leave_room:" << responseData;
+
+    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject responseObj = responseDoc.object();
+    stackedWidget->setCurrentIndex(3); // Go back to the previous screen
 }
 
 void CreateGameRoom::onSendInviteClicked() {
@@ -80,19 +117,64 @@ void CreateGameRoom::onSendInviteClicked() {
 }
 
 void CreateGameRoom::populateOnlinePlayers() {
-    // Clear any existing items in the list
-    onlinePlayersList->clear();
+    QTcpSocket socket;
+    socket.connectToHost("192.168.10.103", 8080);
 
-    // Hardcoded list of online players
-    QStringList players = {"Player1", "Player2", "Player3", "Player4"};
+    if (!socket.waitForConnected(3000)) {
+        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
+    }
 
-    for (const QString &player : players) {
+
+    QJsonObject requestJson;
+    requestJson["type"] = "online_users";
+    requestJson["token"] = token;
+
+    QJsonDocument requestDoc(requestJson);
+    QByteArray requestData = requestDoc.toJson();
+    socket.write(requestData);
+
+    if (!socket.waitForBytesWritten(3000)) {
+        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
+    }
+
+    // Wait for the server's response
+    if (!socket.waitForReadyRead(3000)) {
+        QMessageBox::critical(this, "Error", "No response from the server.");
+    }
+    QByteArray responseData = socket.readAll();
+
+    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject responseObj = responseDoc.object();
+
+    QString status = responseObj["status"].toString();
+    QString message = responseObj["message"].toString();
+
+    // {"data":[{"id":"2","username":"alice"}],"message":"Online users retrieved","status":"success"}
+    if (status == "success") {
+        QJsonArray dataArray = responseObj["data"].toArray();
+        std::vector<Player> players;
+        for (const QJsonValue &value : dataArray) {
+            QJsonObject playerObj = value.toObject();
+            Player player;
+            player.id = playerObj["id"].toString();
+            player.username = playerObj["username"].toString();
+            players.push_back(player);
+            qDebug() << player.id << " " << player.username;
+        }
+        displayOnlinePlayers(players);
+    } else {
+        QMessageBox::critical(this, "Error", message);
+    }
+}
+
+void CreateGameRoom::displayOnlinePlayers(std::vector<Player>& players) {
+    for (const Player &player : players) {
         // Create a custom widget for each player
         QWidget *itemWidget = new QWidget(onlinePlayersList);
         QHBoxLayout *itemLayout = new QHBoxLayout(itemWidget);
 
         // Create the player name label
-        QLabel *playerLabel = new QLabel(player, itemWidget);
+        QLabel *playerLabel = new QLabel(player.username, itemWidget);
 
         // Set a minimum height for the label to ensure text is not cut off
         playerLabel->setMinimumHeight(30);
@@ -103,6 +185,11 @@ void CreateGameRoom::populateOnlinePlayers() {
         // Adjust the button size
         sendButton->setMinimumHeight(30);
         sendButton->setFixedWidth(100);
+
+        // Connect the button's clicked signal to the slot
+        connect(sendButton, &QPushButton::clicked, this, [this, player]() {
+            onSendButtonClicked(player.id);
+        });
 
         // Add the label and button to the layout
         itemLayout->addWidget(playerLabel);
@@ -119,6 +206,41 @@ void CreateGameRoom::populateOnlinePlayers() {
         onlinePlayersList->addItem(listItem);
         onlinePlayersList->setItemWidget(listItem, itemWidget);
     }
+}
+
+void CreateGameRoom::onSendButtonClicked(const QString &userId) {
+    QTcpSocket socket;
+    socket.connectToHost("192.168.10.103", 8080);
+
+    if (!socket.waitForConnected(3000)) {
+        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
+    }
+
+
+    QJsonObject requestJson;
+    requestJson["type"] = "invite_user";
+    requestJson["token"] = token;
+    requestJson["user_id"] = userId;
+
+
+    QJsonDocument requestDoc(requestJson);
+    QByteArray requestData = requestDoc.toJson();
+    socket.write(requestData);
+
+    if (!socket.waitForBytesWritten(3000)) {
+        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
+    }
+
+    // Wait for the server's response
+    if (!socket.waitForReadyRead(3000)) {
+        QMessageBox::critical(this, "Error", "No response from the server.");
+    }
+    QByteArray responseData = socket.readAll();
+
+    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject responseObj = responseDoc.object();
+    QString message = responseObj["message"].toString();
+    QMessageBox::information(this, "Invite User", message);
 }
 
 QString CreateGameRoom::generateRoomID() {
@@ -177,4 +299,52 @@ QString CreateGameRoom::generateRoomID() {
 
 void CreateGameRoom::displayRoomID() {
     roomIDLabel->setText("Room ID: " + roomID);  // This updates the label with the room ID
+}
+
+void CreateGameRoom::onPlayerChanges(const QByteArray &message) {
+    QJsonDocument doc = QJsonDocument::fromJson(message);
+
+    // Check if the parsing was successful
+    if (!doc.isObject()) {
+        qWarning() << "Invalid JSON format!";
+        return;
+    }
+
+    // Get the root JSON object
+    QJsonObject jsonObject = doc.object();
+
+    // Check if the "type" attribute exists and matches "ROOM_PLAYERS_CHANGE"
+    if (jsonObject.contains("type") && jsonObject["type"].toString() == "ROOM_PLAYERS_CHANGE") {
+        qDebug() << "Message type is ROOM_PLAYERS_CHANGE";
+
+        // Check if the "data" attribute exists and is an object
+        if (jsonObject.contains("data") && jsonObject["data"].isObject()) {
+            QJsonObject dataObject = jsonObject["data"].toObject();
+
+            // Extract "firstPlayerId" and "secondPlayerId"
+            QString firstPlayerId = dataObject.value("firstPlayerId").toString();
+            QString secondPlayerId = dataObject.value("secondPlayerId").toString();
+
+            // Print IDs to console
+            qDebug() << "First Player ID:" << firstPlayerId;
+            qDebug() << "Second Player ID:" << secondPlayerId;
+
+            // Update labels
+            player1Label->setText("First Player: " + firstPlayerId);
+            player2Label->setText("Second Player: " + secondPlayerId);
+        } else {
+            qWarning() << "'data' not found or is not an object!";
+        }
+
+        // Display the "message" part in a message box
+        if (jsonObject.contains("message")) {
+            QString messageText = jsonObject["message"].toString();
+            QMessageBox::information(this, "Room Players Change", messageText);
+        } else {
+            qWarning() << "'message' not found in JSON!";
+        }
+
+    } else {
+        qDebug() << "Message type is not ROOM_PLAYERS_CHANGE, ignoring.";
+    }
 }
