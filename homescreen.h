@@ -19,6 +19,7 @@ private slots:
     void onLeaderboardClicked();
     void onHistoryClicked();
     void onLogOutClicked();
+    void HandleLoggedOut();
 
 private:
     QPushButton *joinGameRoomButton;

@@ -1,6 +1,14 @@
 #include "homescreen.h"
 #include "historyscreen.h"
+#include "creategameroom.h"
+#include <QMessageBox>
 #include <QDebug>
+#include <QTcpSocket>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QLabel>
+#include <QApplication>
+
 extern QString globalUserToken;
 
 HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
@@ -33,7 +41,23 @@ void HomeScreen::onJoinGameRoomClicked() {
 }
 
 void HomeScreen::onCreateGameRoomClicked() {
-    stackedWidget->setCurrentIndex(5); // Navigate to Create Game Room Screen
+    CreateGameRoom *createGameRoom = dynamic_cast<CreateGameRoom *>(stackedWidget->widget(5)); // Index 5
+    if (createGameRoom) {
+        createGameRoom->setToken(globalUserToken); // Pass the token dynamically
+        QString roomId = createGameRoom->generateRoomID();
+
+        if (roomId.isEmpty() || roomId == "failed") {
+            qDebug() << "Room ID generation failed. Cannot create game room.";
+            return; // Stop further processing
+        }
+
+        qDebug() << "Generated Room ID: " << roomId;
+        createGameRoom->setRoomID(roomId);
+        createGameRoom->displayRoomID();
+
+        // Navigate to Create Game Room Screen only if RoomID generation succeeds
+        stackedWidget->setCurrentIndex(5);
+    }
 }
 
 void HomeScreen::onLeaderboardClicked() {
@@ -50,5 +74,55 @@ void HomeScreen::onHistoryClicked() {
 }
 
 void HomeScreen::onLogOutClicked() {
-    stackedWidget->setCurrentIndex(0); // Navigate back to Initial Screen
+    HandleLoggedOut(); // Call logout logic first
 }
+
+
+void HomeScreen::HandleLoggedOut() {
+    QTcpSocket socket;
+    socket.connectToHost("127.0.0.1", 8080);
+
+    if (!socket.waitForConnected(3000)) {
+        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
+        return;
+    }
+
+    QJsonObject json;
+    json["type"] = "logout";
+    json["token"] = globalUserToken;
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson();
+
+    if (socket.write(data) == -1) {
+        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
+        return;
+    }
+
+    if (!socket.waitForBytesWritten(3000)) {
+        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
+        return;
+    }
+
+    if (!socket.waitForReadyRead(3000)) {
+        QMessageBox::critical(this, "Error", "No response from the server.");
+        return;
+    }
+
+    QByteArray responseData = socket.readAll();
+    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject responseObj = responseDoc.object();
+
+    qDebug() << "Server response for view_profile:" << responseData;
+
+    if (responseObj["status"].toString() == "success") {
+        QMessageBox::information(this, "Logout Successful", "You have logged out from the game.");
+        stackedWidget->setCurrentIndex(0); // Navigate back to Initial Screen
+    } else {
+        QString errorMessage = responseObj["message"].toString();
+        QMessageBox::critical(this, "Logout Failed", errorMessage);
+    }
+}
+
+
+
+

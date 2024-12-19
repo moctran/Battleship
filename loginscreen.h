@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QStackedWidget>
+#include <QTcpSocket>
 
 class LoginScreen : public QWidget {
     Q_OBJECT

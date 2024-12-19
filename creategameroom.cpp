@@ -1,6 +1,12 @@
 #include "creategameroom.h"
-#include <QRandomGenerator>
+#include "battleshipboard.h"
 #include <QMessageBox>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QDebug>
+
+extern QString globalUserToken;
 
 CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     : QWidget(parent), stackedWidget(stackedWidget) {
@@ -20,7 +26,8 @@ CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     leftLayout->addWidget(backButton);
 
     // Right side (Room ID and Online Players)
-    roomIDLabel = new QLabel("Room ID: " + generateRoomID(), this);
+    roomIDLabel = new QLabel("Room ID: ", this);
+
     onlinePlayersList = new QListWidget(this);
 
     populateOnlinePlayers();
@@ -42,9 +49,26 @@ CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     connect(backButton, &QPushButton::clicked, this, &CreateGameRoom::onBackClicked);
 }
 
+// Redirect to set up ship screen
 void CreateGameRoom::onStartGameClicked() {
-    QMessageBox::information(this, "Start Game", "Starting the game...");
-    // Add actual game logic here
+    QMessageBox::information(this, "Game preparation", "Redirect to ship set up screen...");
+
+    BattleshipBoard *setupBoard = dynamic_cast<BattleshipBoard *>(stackedWidget->widget(7)); // Index 5
+    if (setupBoard) {
+        setupBoard->setToken(globalUserToken); // Pass the token dynamically
+    }
+
+    stackedWidget->setCurrentIndex(7);
+}
+
+void CreateGameRoom::setToken(const QString &newToken) {
+    token = newToken;
+    qDebug() << "Token set in CreateGameScreen:" << token;
+}
+
+void CreateGameRoom::setRoomID(const QString &roomId) {
+    roomID = roomId;
+    qDebug() << "RoomID set in CreateGameScreen:" << roomID;
 }
 
 void CreateGameRoom::onBackClicked() {
@@ -98,6 +122,59 @@ void CreateGameRoom::populateOnlinePlayers() {
 }
 
 QString CreateGameRoom::generateRoomID() {
-    // Generate a random 6-digit Room ID
-    return QString::number(QRandomGenerator::global()->bounded(100000, 999999));
+    QTcpSocket socket;
+    socket.connectToHost("127.0.0.1", 8080);
+
+    if (!socket.waitForConnected(3000)) {
+        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
+        return QString();
+    }
+
+    // Prepare the request JSON
+    qDebug() << "Using token for create_room request:" << token;
+
+    QJsonObject requestJson;
+    requestJson["type"] = "create_room";
+    requestJson["token"] = token;
+
+    QJsonDocument requestDoc(requestJson);
+    QByteArray requestData = requestDoc.toJson();
+    socket.write(requestData);
+
+    // Wait for the server to acknowledge the request
+    if (!socket.waitForBytesWritten(3000)) {
+        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
+        return QString();
+    }
+
+    // Wait for the server's response
+    if (!socket.waitForReadyRead(3000)) {
+        QMessageBox::critical(this, "Error", "No response from the server.");
+        return QString();
+    }
+
+    // Process the response
+    QByteArray responseData = socket.readAll();
+    qDebug() << "Server response for create_room:" << responseData;
+
+    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject responseObj = responseDoc.object();
+
+    QString status = responseObj["status"].toString();
+    QString message = responseObj["message"].toString();
+
+    if (status == "success") {
+        QJsonObject dataObj = responseObj["data"].toObject();
+        QString roomId = dataObj["id"].toString();
+
+        QMessageBox::information(this, "Room Created", "Room created successfully. Room ID: " + roomId);
+        return roomId;
+    } else {
+        QMessageBox::critical(this, "Error", message);
+        return QString() = "failed";
+    }
+}
+
+void CreateGameRoom::displayRoomID() {
+    roomIDLabel->setText("Room ID: " + roomID);  // This updates the label with the room ID
 }

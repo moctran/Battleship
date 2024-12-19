@@ -47,7 +47,6 @@ void HistoryScreen::fetchHistory() {
         return;
     }
 
-    qDebug() << "Using token for view_profile request:" << token;
 
     QJsonObject json;
     json["type"] = "view_profile";
@@ -80,8 +79,6 @@ void HistoryScreen::fetchHistory() {
         QString errorMessage = responseObj["message"].toString();
         QMessageBox::critical(this, "Error", errorMessage);
     }
-
-    socket.close();
 }
 
 void HistoryScreen::displayHistory(const QJsonObject &data) {

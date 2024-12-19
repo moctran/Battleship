@@ -1,9 +1,9 @@
 #include "loginscreen.h"
 #include <QMessageBox>
-#include <QTcpSocket>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLabel>
+
 extern QString globalUserToken;
 
 LoginScreen::LoginScreen(QStackedWidget *stackedWidget, QWidget *parent)

@@ -6,6 +6,8 @@
 #include "joingameroom.h"
 #include "creategameroom.h"
 #include "historyscreen.h"
+#include "battleshipboard.h"
+#include "gameboard.h"
 #include <QString>
 QString globalUserToken;
 
@@ -24,6 +26,9 @@ int main(int argc, char *argv[]) {
 
     CreateGameRoom *createGameRoom = new CreateGameRoom(&stackedWidget);
 
+    BattleshipBoard *setupgameBoard = new BattleshipBoard(&stackedWidget); // Set up board
+    GameBoard *gameBoard = new GameBoard(&stackedWidget);
+
     // Add screens to the stacked widget
     stackedWidget.addWidget(initialScreen); // Index 0
     stackedWidget.addWidget(loginScreen);   // Index 1
@@ -33,6 +38,8 @@ int main(int argc, char *argv[]) {
     stackedWidget.addWidget(createGameRoom); // Index 5
 
     stackedWidget.addWidget(historyScreen); // Add History Screen at an appropriate index (6)
+    stackedWidget.addWidget(setupgameBoard); // Index 7
+    stackedWidget.addWidget(gameBoard); // Index 8
     stackedWidget.setCurrentWidget(initialScreen);
     stackedWidget.show();
 
