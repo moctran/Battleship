@@ -31,7 +31,15 @@ QTcpSocket* SocketManager::getSocket() {
 void SocketManager::connectToServer(const QString& host, quint16 port) {
     if (socket->state() == QTcpSocket::UnconnectedState) {
         socket->connectToHost(host, port);
+        // Wait for connection
+        if (!socket->waitForConnected(5000)) { // 5000 ms timeout
+            qDebug() << "Failed to connect to server:" << socket->errorString();
+            emit errorOccurred("Failed to connect to server: " + socket->errorString());
+        } else {
+            qDebug() << "Successfully connected to server.";
+        }
     }
+
 }
 
 void SocketManager::disconnectFromServer() {
