@@ -14,6 +14,7 @@ extern QString globalUserToken;
 HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     : QWidget(parent), stackedWidget(stackedWidget) {
 
+
     joinGameRoomButton = new QPushButton("Join Game Room", this);
     createGameRoomButton = new QPushButton("Create Game Room", this);
     leaderboardButton = new QPushButton("Leaderboard", this);
@@ -106,7 +107,7 @@ void HomeScreen::HandleLoggedOut() {
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
-    qDebug() << "Server response for view_profile:" << responseData;
+    qDebug() << "Server response for log_out:" << responseData;
 
     if (responseObj["status"].toString() == "success") {
         QMessageBox::information(this, "Logout Successful", "You have logged out from the game.");

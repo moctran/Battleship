@@ -3,8 +3,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLabel>
+#include <SocketManager.h>
 
 extern QString globalUserToken;
+
 
 LoginScreen::LoginScreen(QStackedWidget *stackedWidget, QWidget *parent)
     : QWidget(parent), stackedWidget(stackedWidget) {
@@ -40,10 +42,11 @@ void LoginScreen::onLoginButtonClicked() {
         return;
     }
 
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 8080);
+    // Temporary socket for login operation
+    QTcpSocket tempSocket;
+    tempSocket.connectToHost("127.0.0.1", 8080);
 
-    if (!socket.waitForConnected(3000)) {
+    if (!tempSocket.waitForConnected(3000)) {
         QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
         return;
     }
@@ -55,19 +58,19 @@ void LoginScreen::onLoginButtonClicked() {
 
     QJsonDocument doc(json);
     QByteArray data = doc.toJson();
-    socket.write(data);
+    tempSocket.write(data);
 
-    if (!socket.waitForBytesWritten(3000)) {
+    if (!tempSocket.waitForBytesWritten(3000)) {
         QMessageBox::critical(this, "Error", "Failed to send data to the server.");
         return;
     }
 
-    if (!socket.waitForReadyRead(3000)) {
+    if (!tempSocket.waitForReadyRead(3000)) {
         QMessageBox::critical(this, "Error", "No response from the server.");
         return;
     }
 
-    QByteArray responseData = socket.readAll();
+    QByteArray responseData = tempSocket.readAll();
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
@@ -85,7 +88,11 @@ void LoginScreen::onLoginButtonClicked() {
         QMessageBox::critical(this, "Login Failed", errorMessage);
     }
 
-    socket.close();
+    // Clear the input fields after the process
+    usernameInput->clear();
+    passwordInput->clear();
+
+    tempSocket.close();
 }
 
 void LoginScreen::onBackButtonClicked() {
