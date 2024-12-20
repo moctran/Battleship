@@ -15,8 +15,9 @@
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <basegamescreen.h>
 
-class GameBoard : public QWidget {
+class GameBoard : public BaseGameScreen {
     Q_OBJECT
 
 public:

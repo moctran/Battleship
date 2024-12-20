@@ -19,8 +19,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <basegamescreen.h>
 
-class BattleshipBoard : public QWidget {
+class BattleshipBoard : public BaseGameScreen {
     Q_OBJECT
 
 public:

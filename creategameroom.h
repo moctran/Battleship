@@ -10,12 +10,13 @@
 #include <QListWidget>
 #include <QStackedWidget>
 #include <QTcpSocket>
+#include "basegamescreen.h"
 
-class CreateGameRoom : public QWidget {
+class CreateGameRoom : public BaseGameScreen {
     Q_OBJECT
 
 public:
-    explicit CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent = nullptr);
+    CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent = nullptr);
     void setToken(const QString &newToken); // Set token dynamically
     QString generateRoomID();     // Function to generate a random Room ID
     void setRoomID(const QString &roomId);
@@ -28,7 +29,7 @@ public:
     void onSendButtonClicked(const QString &userId);
     void populateOnlinePlayers(); // Function to populate online players list
     void displayOnlinePlayers(std::vector<Player>& players);
-
+    void updateLabels(const QString player1Name, const QString player2Name);
 
 private slots:
     void onStartGameClicked();

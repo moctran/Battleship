@@ -8,7 +8,7 @@ extern QString globalUserToken;
 
 // Constructor
 GameBoard::GameBoard(QStackedWidget *stackedWidget, QWidget *parent)
-    : QWidget(parent), stackedWidget(stackedWidget), selectedBlock(nullptr) {
+    : BaseGameScreen(stackedWidget, parent), stackedWidget(stackedWidget) {
     // Main layout to contain both boards and the game title
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
 
@@ -140,7 +140,7 @@ void GameBoard::onMakeMoveClicked() {
 
 void GameBoard::sendMoveRequest(int row, int col) {
     /* QTcpSocket *socket = new QTcpSocket(this); // Use dynamic socket for signal-slot connections
-    socket->connectToHost("192.168.10.103", 8080);
+    socket->connectToHost("127.0.0.1", 8080);
 
     // Check if connection to the server is successful
     if (!socket->waitForConnected(3000)) {
@@ -204,7 +204,7 @@ void GameBoard::sendMoveRequest(int row, int col) {
 // Handle return button click
 void GameBoard::onReturnClicked() {
     QTcpSocket socket;
-    socket.connectToHost("192.168.10.103", 8080);
+    socket.connectToHost("127.0.0.1", 8080);
 
     if (!socket.waitForConnected(3000)) {
         QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");

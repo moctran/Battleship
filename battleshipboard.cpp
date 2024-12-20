@@ -8,7 +8,7 @@ extern QString globalUserToken;
 // This is a set up board
 // Constructor of a set up board
 BattleshipBoard::BattleshipBoard(QStackedWidget *stackedWidget, QWidget *parent)
-    : QWidget(parent), stackedWidget(stackedWidget) {
+    : BaseGameScreen(stackedWidget, parent), stackedWidget(stackedWidget) {
     setAcceptDrops(true);
 
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
@@ -288,7 +288,7 @@ void BattleshipBoard::submitArrangementToServer() {
 
     // Create a TCP socket
     QTcpSocket socket;
-    socket.connectToHost("192.168.10.103", 8080);
+    socket.connectToHost("127.0.0.1", 8080);
 
     // Check connection
     if (!socket.waitForConnected(3000)) {
@@ -337,9 +337,7 @@ void BattleshipBoard::printBoardState() {
 }
 
 void BattleshipBoard::onReturnButtonClicked() {
-    QMessageBox::information(this, "Leave Game", "Leaving game room...");
-    resetBoardState();
-    stackedWidget->setCurrentIndex(3);
+    leaveRoom(token, stackedWidget);
 }
 
 // Add Play Game Handler

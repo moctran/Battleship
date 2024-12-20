@@ -43,7 +43,7 @@ void JoinGameRoom::onJoinRoomClicked() {
 
     // Set up the socket connection
     QTcpSocket socket;
-    socket.connectToHost("192.168.10.103", 8080);
+    socket.connectToHost("127.0.0.1", 8080);
 
     if (!socket.waitForConnected(3000)) {
         QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
@@ -74,7 +74,10 @@ void JoinGameRoom::onJoinRoomClicked() {
     } else {
         qDebug() << responseObj["firstPlayerId"].toString();
         qDebug() << responseObj["secondPlayerId"].toString();
-        redirect(responseObj["firstPlayerId"].toString(), responseObj["secondPlayerId"].toString(), responseObj["id"].toString());
+        redirect(responseObj.value("firstPlayerId").toString(),
+                 responseObj.value("secondPlayerId").toString(),
+                 responseObj.value("id").toString());
+
     }
     // Clear input field after submission
     roomNumberInput->clear();
@@ -86,6 +89,7 @@ void JoinGameRoom::redirect(QString firstPlayerId, QString secondPlayerId, QStri
         createGameRoom->setToken(globalUserToken); // Pass the token dynamically
         createGameRoom->setRoomID(roomID);
         createGameRoom->displayRoomID();
+        createGameRoom->updateLabels(firstPlayerId, secondPlayerId);
         // Navigate to Create Game Room Screen only if RoomID generation succeeds
         stackedWidget->setCurrentIndex(5);
     }

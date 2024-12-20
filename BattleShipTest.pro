@@ -1,4 +1,5 @@
 SOURCES += \
+    basegamescreen.cpp \
     battleshipboard.cpp \
     creategameroom.cpp \
     gameboard.cpp \
@@ -17,6 +18,7 @@ QT += network
 QT += core gui widgets
 
 HEADERS += \
+    basegamescreen.h \
     battleshipboard.h \
     creategameroom.h \
     gameboard.h \

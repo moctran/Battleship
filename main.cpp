@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     NetworkManager networkManager;
 
     // Connect to localhost:8080
-    networkManager.connectToServer("192.168.10.103", 8080);
+    networkManager.connectToServer("127.0.0.1", 8080);
 
     // Send subscription message once connected
     QObject::connect(&networkManager, &NetworkManager::connectionEstablished, [&]() {

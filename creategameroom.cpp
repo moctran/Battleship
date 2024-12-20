@@ -10,7 +10,7 @@
 extern QString globalUserToken;
 
 CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
-    : QWidget(parent), stackedWidget(stackedWidget) {
+    : BaseGameScreen(stackedWidget, parent), stackedWidget(stackedWidget) {
 
     // Left side (Player Info and Buttons)
     player1Label = new QLabel("My Name", this);
@@ -30,8 +30,6 @@ CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     roomIDLabel = new QLabel("Room ID: ", this);
 
     onlinePlayersList = new QListWidget(this);
-
-    populateOnlinePlayers();
 
     QVBoxLayout *rightLayout = new QVBoxLayout();
     rightLayout->addWidget(roomIDLabel);
@@ -75,41 +73,42 @@ void CreateGameRoom::setRoomID(const QString &roomId) {
 }
 
 void CreateGameRoom::onBackClicked() {
-    QTcpSocket socket;
-    socket.connectToHost("192.168.10.103", 8080);
+    // QTcpSocket socket;
+    // socket.connectToHost("127.0.0.1", 8080);
 
-    if (!socket.waitForConnected(3000)) {
-        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
-    }
+    // if (!socket.waitForConnected(3000)) {
+    //     QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
+    // }
 
-    // Prepare the request JSON
-    qDebug() << "Using token for leave_room request:" << token;
+    // // Prepare the request JSON
+    // qDebug() << "Using token for leave_room request:" << token;
 
-    QJsonObject requestJson;
-    requestJson["type"] = "leave_room";
-    requestJson["token"] = token;
+    // QJsonObject requestJson;
+    // requestJson["type"] = "leave_room";
+    // requestJson["token"] = token;
 
-    QJsonDocument requestDoc(requestJson);
-    QByteArray requestData = requestDoc.toJson();
-    socket.write(requestData);
+    // QJsonDocument requestDoc(requestJson);
+    // QByteArray requestData = requestDoc.toJson();
+    // socket.write(requestData);
 
-    // Wait for the server to acknowledge the request
-    if (!socket.waitForBytesWritten(3000)) {
-        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
-    }
+    // // Wait for the server to acknowledge the request
+    // if (!socket.waitForBytesWritten(3000)) {
+    //     QMessageBox::critical(this, "Error", "Failed to send data to the server.");
+    // }
 
-    // Wait for the server's response
-    if (!socket.waitForReadyRead(3000)) {
-        QMessageBox::critical(this, "Error", "No response from the server.");
-    }
+    // // Wait for the server's response
+    // if (!socket.waitForReadyRead(3000)) {
+    //     QMessageBox::critical(this, "Error", "No response from the server.");
+    // }
 
-    // Process the response
-    QByteArray responseData = socket.readAll();
-    qDebug() << "Server response for leave_room:" << responseData;
+    // // Process the response
+    // QByteArray responseData = socket.readAll();
+    // qDebug() << "Server response for leave_room:" << responseData;
 
-    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
-    QJsonObject responseObj = responseDoc.object();
-    stackedWidget->setCurrentIndex(3); // Go back to the previous screen
+    // QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    // QJsonObject responseObj = responseDoc.object();
+    // stackedWidget->setCurrentIndex(3); // Go back to the previous screen
+    leaveRoom(token, stackedWidget);
 }
 
 void CreateGameRoom::onSendInviteClicked() {
@@ -117,13 +116,15 @@ void CreateGameRoom::onSendInviteClicked() {
 }
 
 void CreateGameRoom::populateOnlinePlayers() {
+    qDebug() << "populateOnlinePlayers() called";
+
     QTcpSocket socket;
-    socket.connectToHost("192.168.10.103", 8080);
+    socket.connectToHost("127.0.0.1", 8080);
 
     if (!socket.waitForConnected(3000)) {
         QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
+        return;
     }
-
 
     QJsonObject requestJson;
     requestJson["type"] = "online_users";
@@ -135,21 +136,21 @@ void CreateGameRoom::populateOnlinePlayers() {
 
     if (!socket.waitForBytesWritten(3000)) {
         QMessageBox::critical(this, "Error", "Failed to send data to the server.");
+        return;
     }
 
-    // Wait for the server's response
     if (!socket.waitForReadyRead(3000)) {
         QMessageBox::critical(this, "Error", "No response from the server.");
+        return;
     }
-    QByteArray responseData = socket.readAll();
 
+    QByteArray responseData = socket.readAll();
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
     QString status = responseObj["status"].toString();
     QString message = responseObj["message"].toString();
 
-    // {"data":[{"id":"2","username":"alice"}],"message":"Online users retrieved","status":"success"}
     if (status == "success") {
         QJsonArray dataArray = responseObj["data"].toArray();
         std::vector<Player> players;
@@ -161,11 +162,12 @@ void CreateGameRoom::populateOnlinePlayers() {
             players.push_back(player);
             qDebug() << player.id << " " << player.username;
         }
-        displayOnlinePlayers(players);
+        displayOnlinePlayers(players); // Hiển thị danh sách người chơi online
     } else {
         QMessageBox::critical(this, "Error", message);
     }
 }
+
 
 void CreateGameRoom::displayOnlinePlayers(std::vector<Player>& players) {
     for (const Player &player : players) {
@@ -210,7 +212,7 @@ void CreateGameRoom::displayOnlinePlayers(std::vector<Player>& players) {
 
 void CreateGameRoom::onSendButtonClicked(const QString &userId) {
     QTcpSocket socket;
-    socket.connectToHost("192.168.10.103", 8080);
+    socket.connectToHost("127.0.0.1", 8080);
 
     if (!socket.waitForConnected(3000)) {
         QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
@@ -245,7 +247,7 @@ void CreateGameRoom::onSendButtonClicked(const QString &userId) {
 
 QString CreateGameRoom::generateRoomID() {
     QTcpSocket socket;
-    socket.connectToHost("192.168.10.103", 8080);
+    socket.connectToHost("127.0.0.1", 8080);
 
     if (!socket.waitForConnected(3000)) {
         QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
@@ -348,3 +350,13 @@ void CreateGameRoom::onPlayerChanges(const QByteArray &message) {
         qDebug() << "Message type is not ROOM_PLAYERS_CHANGE, ignoring.";
     }
 }
+
+void CreateGameRoom::updateLabels(const QString player1Name, const QString player2Name) {
+    player1Label->setText("First Player: " + player1Name);
+    player2Label->setText("Second Player: " + player2Name);
+
+    qDebug() << "Updated Labels:";
+    qDebug() << "First Player: " << player1Name;
+    qDebug() << "Second Player: " << player2Name;
+}
+
