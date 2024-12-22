@@ -19,18 +19,24 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTimer>
 #include <basegamescreen.h>
+#include <socketmanager.h>
+#include <announcementpopup.h>
 
 class BattleshipBoard : public BaseGameScreen {
     Q_OBJECT
 
 public:
     BattleshipBoard(QStackedWidget *stackedWidget, QWidget *parent = nullptr);
-    void setToken(const QString &newToken); // Set token dynamically
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
+
+private slots:
+    void setUpAnnouncement(const QByteArray &message);
+    void playGameRedirect(const QByteArray &message);
 
 private:
     QGridLayout *playerLayout;
@@ -41,7 +47,6 @@ private:
     QStackedWidget *stackedWidget;
     QLabel *gameTitle;
     QPushButton *orientationButton;
-    QString token; // Player token will be stored here
 
     QList<QPushButton *> availableShips; // Store all the ship buttons
     QMap<int, QString> shipColors; // Map ship size to color

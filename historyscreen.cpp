@@ -1,4 +1,5 @@
 #include "historyscreen.h"
+#include "basescreen.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -6,7 +7,7 @@
 #include <QDebug>
 
 HistoryScreen::HistoryScreen(QStackedWidget *stackedWidget, const QString &token, QWidget *parent)
-    : QWidget(parent), stackedWidget(stackedWidget), token(token) {
+    : baseScreen(parent), stackedWidget(stackedWidget), token(token) {
 
     summaryLabel = new QLabel(this);
     historyList = new QListWidget(this);
@@ -39,34 +40,11 @@ void HistoryScreen::loadHistory() {
 }
 
 void HistoryScreen::fetchHistory() {
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 8080);
+    QJsonObject requestJson;
+    requestJson["type"] = "view_profile";
+    requestJson["token"] = token;
 
-    if (!socket.waitForConnected(3000)) {
-        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
-        return;
-    }
-
-
-    QJsonObject json;
-    json["type"] = "view_profile";
-    json["token"] = token;
-
-    QJsonDocument doc(json);
-    QByteArray data = doc.toJson();
-    socket.write(data);
-
-    if (!socket.waitForBytesWritten(3000)) {
-        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
-        return;
-    }
-
-    if (!socket.waitForReadyRead(3000)) {
-        QMessageBox::critical(this, "Error", "No response from the server.");
-        return;
-    }
-
-    QByteArray responseData = socket.readAll();
+    QByteArray responseData = sendRequest(requestJson, 3000);
 
     qDebug() << "Server response for view_profile:" << responseData;
 

@@ -6,8 +6,9 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QStackedWidget>
+#include <basescreen.h>
 
-class HomeScreen : public QWidget {
+class HomeScreen : public baseScreen {
     Q_OBJECT
 
 public:

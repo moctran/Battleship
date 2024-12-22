@@ -17,7 +17,6 @@ class CreateGameRoom : public BaseGameScreen {
 
 public:
     CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent = nullptr);
-    void setToken(const QString &newToken); // Set token dynamically
     QString generateRoomID();     // Function to generate a random Room ID
     void setRoomID(const QString &roomId);
     void displayRoomID();
@@ -36,6 +35,7 @@ private slots:
     void onBackClicked();
     void onSendInviteClicked();
     void onPlayerChanges(const QByteArray &message);
+    void onSetUpRedirect(const QByteArray &message);
 
 private:
     QLabel *player1Label;
@@ -46,7 +46,6 @@ private:
     QListWidget *onlinePlayersList;
     QVBoxLayout *mainLayout;
     QStackedWidget *stackedWidget;
-    QString token;
     QString roomID;
 };
 

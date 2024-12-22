@@ -1,5 +1,7 @@
 SOURCES += \
+    announcementpopup.cpp \
     basegamescreen.cpp \
+    basescreen.cpp \
     battleshipboard.cpp \
     creategameroom.cpp \
     gameboard.cpp \
@@ -9,7 +11,6 @@ SOURCES += \
     joingameroom.cpp \
     loginscreen.cpp \
     main.cpp \
-    networkmanager.cpp \
     signupscreen.cpp \
     socketmanager.cpp \
     testScreen.cpp
@@ -18,7 +19,9 @@ QT += network
 QT += core gui widgets
 
 HEADERS += \
+    announcementpopup.h \
     basegamescreen.h \
+    basescreen.h \
     battleshipboard.h \
     creategameroom.h \
     gameboard.h \
@@ -27,7 +30,6 @@ HEADERS += \
     initialscreen.h \
     joingameroom.h \
     loginscreen.h \
-    networkmanager.h \
     signupscreen.h \
     socketmanager.h \
     testScreen.h

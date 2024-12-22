@@ -13,7 +13,7 @@
 extern QString globalUserToken;
 
 HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
-    : QWidget(parent), stackedWidget(stackedWidget) {
+    : baseScreen(parent), stackedWidget(stackedWidget) {
 
     joinGameRoomButton = new QPushButton("Join Game Room", this);
     createGameRoomButton = new QPushButton("Create Game Room", this);
@@ -87,40 +87,15 @@ void HomeScreen::onLogOutClicked() {
 
 
 void HomeScreen::HandleLoggedOut() {
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 8080);
+    QJsonObject requestJson;
+    requestJson["type"] = "logout";
+    requestJson["token"] = globalUserToken;
 
-    if (!socket.waitForConnected(3000)) {
-        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
-        return;
-    }
-
-    QJsonObject json;
-    json["type"] = "logout";
-    json["token"] = globalUserToken;
-    QJsonDocument doc(json);
-    QByteArray data = doc.toJson();
-
-    if (socket.write(data) == -1) {
-        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
-        return;
-    }
-
-    if (!socket.waitForBytesWritten(3000)) {
-        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
-        return;
-    }
-
-    if (!socket.waitForReadyRead(3000)) {
-        QMessageBox::critical(this, "Error", "No response from the server.");
-        return;
-    }
-
-    QByteArray responseData = socket.readAll();
+    QByteArray responseData = sendRequest(requestJson, 3000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
-    qDebug() << "Server response for view_profile:" << responseData;
+    qDebug() << "Server response for log out:" << responseData;
 
     if (responseObj["status"].toString() == "success") {
         QMessageBox::information(this, "Logout Successful", "You have logged out from the game.");

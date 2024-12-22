@@ -1,6 +1,7 @@
 #ifndef JOINGAMEROOM_H
 #define JOINGAMEROOM_H
 
+#include <basescreen.h>
 #include <QWidget>
 #include <QPushButton>
 #include <QLineEdit>
@@ -12,12 +13,11 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-class JoinGameRoom : public QWidget {
+class JoinGameRoom : public baseScreen {
     Q_OBJECT
 
 public:
-    JoinGameRoom(QStackedWidget *stackedWidget, QWidget *parent = nullptr);
-    void setToken(const QString &newToken); // Set token dynamically
+    JoinGameRoom(QStackedWidget *stackedWidget, QWidget *parent = nullptr);\
 
 private slots:
     void onJoinRoomClicked();
@@ -29,7 +29,6 @@ private:
     QPushButton *backButton;
     QVBoxLayout *layout;
     QStackedWidget *stackedWidget;
-    QString token;
     void redirect(QString firstPlayerId, QString secondPlayerId, QString roomID);
 };
 

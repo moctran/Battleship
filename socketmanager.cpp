@@ -94,3 +94,4 @@ void SocketManager::printSocketInfo() const {
         qDebug() << "  Last Error: None";
     }
 }
+

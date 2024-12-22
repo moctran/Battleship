@@ -75,7 +75,7 @@ void GameBoard::createBoard(QGridLayout *layout, QPushButton *board[10][10], con
         for (int col = 0; col < 10; ++col) {
             board[row][col] = new QPushButton();
             board[row][col]->setFixedSize(40, 40);
-            board[row][col]->setStyleSheet("background-color: lightblue; border: 1px solid gray;");
+            board[row][col]->setStyleSheet("background-color: lightblue");
             layout->addWidget(board[row][col], row, col);
             board[row][col]->setProperty("row", row);
             board[row][col]->setProperty("col", col);
@@ -203,41 +203,7 @@ void GameBoard::sendMoveRequest(int row, int col) {
 
 // Handle return button click
 void GameBoard::onReturnClicked() {
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 8080);
-
-    if (!socket.waitForConnected(3000)) {
-        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
-    }
-
-    // Prepare the request JSON
-    qDebug() << "Using token for leave_room request:" << token;
-
-    QJsonObject requestJson;
-    requestJson["type"] = "leave_room";
-    requestJson["token"] = token;
-
-    QJsonDocument requestDoc(requestJson);
-    QByteArray requestData = requestDoc.toJson();
-    socket.write(requestData);
-
-    // Wait for the server to acknowledge the request
-    if (!socket.waitForBytesWritten(3000)) {
-        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
-    }
-
-    // Wait for the server's response
-    if (!socket.waitForReadyRead(3000)) {
-        QMessageBox::critical(this, "Error", "No response from the server.");
-    }
-
-    // Process the response
-    QByteArray responseData = socket.readAll();
-    qDebug() << "Server response for leave_room:" << responseData;
-
-    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
-    QJsonObject responseObj = responseDoc.object();
-    stackedWidget->setCurrentIndex(3); // Go back to the previous screen
+    leaveRoom(token, stackedWidget);
 }
 
 // Set the token
@@ -262,26 +228,28 @@ void GameBoard::displayInitialState() {
         int col_num = 0;
         for (int cell : row) {
             line += QString::number(cell) + " ";
-            switch (cell) {
-            case 1:
-                playerBoard[row_num][col_num]->setStyleSheet("background-color: red;");
-                break;
-            case 2:
-                playerBoard[row_num][col_num]->setStyleSheet("background-color: orange;");
-                break;
-            case 3:
-                playerBoard[row_num][col_num]->setStyleSheet("background-color: yellow;");
-                break;
-            case 4:
-                playerBoard[row_num][col_num]->setStyleSheet("background-color: green;");
-                break;
-            case 5:
-                playerBoard[row_num][col_num]->setStyleSheet("background-color: blue;");
-                break;
-            default:
-                playerBoard[row_num][col_num]->setStyleSheet("background-color: lightblue;");
-                break;
-            }
+            // switch (cell) {
+            // case 1:
+            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: red;");
+            //     break;
+            // case 2:
+            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: orange;");
+            //     break;
+            // case 3:
+            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: yellow;");
+            //     break;
+            // case 4:
+            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: green;");
+            //     break;
+            // case 5:
+            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: blue;");
+            //     break;
+            // default:
+            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: lightblue;");
+            //     break;
+            // }
+            QString colour = getColour(cell);  // Get the color from the method
+            playerBoard[row_num][col_num]->setStyleSheet("border-color: " + colour + ";");
             col_num += 1;
         }
         row_num += 1;

@@ -1,13 +1,14 @@
 #ifndef SIGNUPSCREEN_H
 #define SIGNUPSCREEN_H
 
+#include <basescreen.h>
 #include <QWidget>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QStackedWidget>
 
-class SignUpScreen : public QWidget {
+class SignUpScreen : public baseScreen {
     Q_OBJECT
 
 public:

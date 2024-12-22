@@ -4,8 +4,9 @@
 
 #include <QWidget>
 #include <QStackedWidget>
+#include <basescreen.h>
 
-class BaseGameScreen : public QWidget {
+class BaseGameScreen : public baseScreen {
     Q_OBJECT
 
 public:
@@ -13,6 +14,7 @@ public:
 
 protected:
     void leaveRoom(const QString &token, QStackedWidget *stackedWidget);
+    QString getColour(int index);
 };
 
 #endif // BASEGAMESCREEN_H

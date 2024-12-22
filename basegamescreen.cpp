@@ -7,7 +7,7 @@
 #include <QDebug>
 
 BaseGameScreen::BaseGameScreen(QStackedWidget *stackedWidget, QWidget *parent)
-    : QWidget(parent) {}
+    : baseScreen(parent) {}
 
 void BaseGameScreen::leaveRoom(const QString &token, QStackedWidget *stackedWidget) {
     QTcpSocket socket;
@@ -54,3 +54,28 @@ void BaseGameScreen::leaveRoom(const QString &token, QStackedWidget *stackedWidg
         QMessageBox::critical(this, "Error", responseObj["message"].toString());
     }
 }
+
+QString BaseGameScreen::getColour(int index) {
+    switch(index) {
+    case 1:
+        return "red";
+        break;
+    case 2:
+        return "orange";
+        break;
+    case 3:
+        return "yellow";
+        break;
+    case 4:
+        return "green";
+        break;
+    case 5:
+        return "blue";
+        break;
+    default:
+        return "lightblue";
+        break;
+    }
+    return QString();
+}
+

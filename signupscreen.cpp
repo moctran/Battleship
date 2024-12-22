@@ -6,7 +6,7 @@
 #include <QLabel>
 
 SignUpScreen::SignUpScreen(QStackedWidget *stackedWidget, QWidget *parent)
-    : QWidget(parent), stackedWidget(stackedWidget) {
+    : baseScreen(parent), stackedWidget(stackedWidget) {
 
     usernameInput = new QLineEdit(this);
     usernameInput->setPlaceholderText("Enter username");
@@ -39,36 +39,35 @@ void SignUpScreen::onSignUpButtonClicked() {
         return;
     }
 
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 8080);
+    // QTcpSocket socket;
+    // socket.connectToHost("127.0.0.1", 8080);
 
-    if (!socket.waitForConnected(3000)) {
-        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
-        return;
-    }
-
+    // if (!socket.waitForConnected(3000)) {
+    //     QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
+    //     return;
+    // }
 
     // Prepare the sign-up request
-    QJsonObject json;
-    json["type"] = "signup";
-    json["username"] = username;
-    json["password"] = password;
+    QJsonObject requestJson;
+    requestJson["type"] = "signup";
+    requestJson["username"] = username;
+    requestJson["password"] = password;
 
-    QJsonDocument doc(json);
-    QByteArray data = doc.toJson();
-    socket.write(data);
+    // QJsonDocument doc(json);
+    // QByteArray data = doc.toJson();
+    // socket.write(data);
 
-    if (!socket.waitForBytesWritten(3000)) {
-        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
-        return;
-    }
+    // if (!socket.waitForBytesWritten(3000)) {
+    //     QMessageBox::critical(this, "Error", "Failed to send data to the server.");
+    //     return;
+    // }
 
-    if (!socket.waitForReadyRead(3000)) {
-        QMessageBox::critical(this, "Error", "No response from the server.");
-        return;
-    }
+    // if (!socket.waitForReadyRead(3000)) {
+    //     QMessageBox::critical(this, "Error", "No response from the server.");
+    //     return;
+    // }
 
-    QByteArray responseData = socket.readAll();
+    QByteArray responseData = sendRequest(requestJson, 3000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
