@@ -8,7 +8,7 @@
 extern QString globalUserToken;
 
 LoginScreen::LoginScreen(QStackedWidget *stackedWidget, QWidget *parent)
-    : QWidget(parent), stackedWidget(stackedWidget) {
+    : baseScreen(parent), stackedWidget(stackedWidget) {
 
     usernameInput = new QLineEdit(this);
     usernameInput->setPlaceholderText("Enter username");
@@ -41,34 +41,12 @@ void LoginScreen::onLoginButtonClicked() {
         return;
     }
 
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 8080);
+    QJsonObject requestJson;
+    requestJson["type"] = "signin";
+    requestJson["username"] = username;
+    requestJson["password"] = password;
 
-    if (!socket.waitForConnected(3000)) {
-        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
-        return;
-    }
-
-    QJsonObject json;
-    json["type"] = "signin";
-    json["username"] = username;
-    json["password"] = password;
-
-    QJsonDocument doc(json);
-    QByteArray data = doc.toJson();
-    socket.write(data);
-
-    if (!socket.waitForBytesWritten(3000)) {
-        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
-        return;
-    }
-
-    if (!socket.waitForReadyRead(3000)) {
-        QMessageBox::critical(this, "Error", "No response from the server.");
-        return;
-    }
-
-    QByteArray responseData = socket.readAll();
+    QByteArray responseData = sendRequest(requestJson, 3000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
@@ -85,7 +63,6 @@ void LoginScreen::onLoginButtonClicked() {
         QString errorMessage = responseObj["message"].toString();
         QMessageBox::critical(this, "Login Failed", errorMessage);
     }
-    socket.close();
 
     // Call the "subscribe_notification" API using SocketManager
     SocketManager* socketManager = SocketManager::getInstance();
@@ -100,8 +77,6 @@ void LoginScreen::onLoginButtonClicked() {
     socketManager->getSocket()->write(subscribeData);
     socketManager->getSocket()->flush();
     socketManager->getInstance()->printSocketInfo();
-
-
 }
 
 void LoginScreen::onBackButtonClicked() {

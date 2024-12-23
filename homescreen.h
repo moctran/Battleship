@@ -6,8 +6,9 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QStackedWidget>
+#include <basescreen.h>
 
-class HomeScreen : public QWidget {
+class HomeScreen : public baseScreen {
     Q_OBJECT
 
 public:
@@ -19,6 +20,7 @@ private slots:
     void onLeaderboardClicked();
     void onHistoryClicked();
     void onLogOutClicked();
+    void onTestClicked();
     void HandleLoggedOut();
 
 private:
@@ -27,6 +29,7 @@ private:
     QPushButton *leaderboardButton;
     QPushButton *historyButton;
     QPushButton *logOutButton;
+    QPushButton *testButton;
     QVBoxLayout *layout;
     QStackedWidget *stackedWidget;
 };

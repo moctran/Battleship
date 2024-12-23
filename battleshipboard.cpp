@@ -1,15 +1,11 @@
 #include "battleshipboard.h"
 #include "gameboard.h"
-#include <QMessageBox>
-#include <QDrag>
-#include <QDebug>
-
 extern QString globalUserToken;
 
 // This is a set up board
 // Constructor of a set up board
 BattleshipBoard::BattleshipBoard(QStackedWidget *stackedWidget, QWidget *parent)
-    : QWidget(parent), stackedWidget(stackedWidget) {
+    : BaseGameScreen(stackedWidget, parent), stackedWidget(stackedWidget) {
     setAcceptDrops(true);
 
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
@@ -45,22 +41,20 @@ BattleshipBoard::BattleshipBoard(QStackedWidget *stackedWidget, QWidget *parent)
     connect(clearButton, &QPushButton::clicked, this, &BattleshipBoard::onClearButtonClicked);
     centerLayout->addWidget(clearButton, 0, Qt::AlignCenter);
 
-    // Return Button
-    returnButton = new QPushButton("Return", this);
-    returnButton->setFixedSize(100, 40);
-    connect(returnButton, &QPushButton::clicked, this, &BattleshipBoard::onReturnButtonClicked);
-    centerLayout->addWidget(returnButton, 0, Qt::AlignCenter);
-
     // Add to main layout
     mainLayout->addLayout(playerContainer);
     mainLayout->addSpacing(20);
     mainLayout->addLayout(centerLayout);
     setLayout(mainLayout);
+
+    SocketManager* socketManager = SocketManager::getInstance();
+    connect(socketManager, &SocketManager::messageReceived, this, &BattleshipBoard::setUpAnnouncement);
+    connect(socketManager, &SocketManager::messageReceived, this, &BattleshipBoard::playGameRedirect);
 }
 
 void BattleshipBoard::createBoard() {
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 8; ++col) {
+    for (int row = 0; row < 10; ++row) {
+        for (int col = 0; col < 10; ++col) {
             playerBoard[row][col] = new QPushButton();
             playerBoard[row][col]->setFixedSize(40, 40);
             playerBoard[row][col]->setStyleSheet("background-color: lightblue;");
@@ -129,16 +123,16 @@ void BattleshipBoard::setupShipsPanel(QVBoxLayout *centralPanel) {
     centralPanel->addLayout(shipsLayout); // Add vertical layout to central panel
 
     // Add Play Game Button
-    playGameButton = new QPushButton("Play Game", this);
-    playGameButton->setFixedSize(150, 40);
-    playGameButton->setStyleSheet("font-size: 14px;");
-    connect(playGameButton, &QPushButton::clicked, this, &BattleshipBoard::onPlayGameClicked);
-    centralPanel->addWidget(playGameButton, 0, Qt::AlignCenter);
+    // playGameButton = new QPushButton("Play Game", this);
+    // playGameButton->setFixedSize(150, 40);
+    // playGameButton->setStyleSheet("font-size: 14px;");
+    // connect(playGameButton, &QPushButton::clicked, this, &BattleshipBoard::onPlayGameClicked);
+    // centralPanel->addWidget(playGameButton, 0, Qt::AlignCenter);
 }
 
 void BattleshipBoard::resetBoardState() {
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 8; ++col) {
+    for (int row = 0; row < 10; ++row) {
+        for (int col = 0; col < 10; ++col) {
             playerBoard[row][col]->setStyleSheet("background-color: lightblue;");
             playerBoard[row][col]->setProperty("state", 0);
         }
@@ -173,8 +167,8 @@ void BattleshipBoard::dropEvent(QDropEvent *event) {
     if (!targetButton) return;
 
     int row = -1, col = -1;
-    for (int r = 0; r < 8; ++r) {
-        for (int c = 0; c < 8; ++c) {
+    for (int r = 0; r < 10; ++r) {
+        for (int c = 0; c < 10; ++c) {
             if (playerBoard[r][c] == targetButton) {
                 row = r;
                 col = c;
@@ -199,7 +193,7 @@ bool BattleshipBoard::canPlaceShip(int row, int col, int size, bool vertical) {
         int checkRow = vertical ? row + i : row;
         int checkCol = vertical ? col : col + i;
 
-        if (checkRow >= 8 || checkCol >= 8 || playerBoard[checkRow][checkCol]->property("state").toInt() != 0)
+        if (checkRow >= 10 || checkCol >= 10 || playerBoard[checkRow][checkCol]->property("state").toInt() != 0)
             return false;
     }
     return true;
@@ -210,25 +204,9 @@ void BattleshipBoard::placeShip(int row, int col, int size, bool vertical) {
     for (int i = 0; i < size; ++i) {
         int setRow = vertical ? row + i : row;
         int setCol = vertical ? col : col + i;
-
         playerBoard[setRow][setCol]->setStyleSheet("background-color: black;");
-        switch (shipPlace) {
-        case 1:
-            playerBoard[setRow][setCol]->setStyleSheet("background-color: red;");
-            break;
-        case 2:
-            playerBoard[setRow][setCol]->setStyleSheet("background-color: orange;");
-            break;
-        case 3:
-            playerBoard[setRow][setCol]->setStyleSheet("background-color: yellow;");
-            break;
-        case 4:
-            playerBoard[setRow][setCol]->setStyleSheet("background-color: green;");
-            break;
-        case 5:
-            playerBoard[setRow][setCol]->setStyleSheet("background-color: blue;");
-            break;
-        }
+        QString colour = getColour(shipPlace);  // Get the color from the method
+        playerBoard[setRow][setCol]->setStyleSheet("background-color: " + colour + ";");
         playerBoard[setRow][setCol]->setProperty("state", shipPlace);
     }
 }
@@ -242,27 +220,54 @@ void BattleshipBoard::onFinishSetupClicked() {
             return; // Stop further execution
         }
     }
+    saveBoardState();
     // If all ships are placed, proceed
     setupFinished = true;
     printBoardState();
     finishSetupButton->setDisabled(true);
+    // Submit arrangement to the server
+    submitArrangementToServer();
+}
+
+void BattleshipBoard::submitArrangementToServer() {
+    // Prepare the JSON request
+    QJsonObject requestJson;
+    requestJson["type"] = "submit_arrangement";
+    requestJson["token"] = token;
+
+    // Convert the 2D board state to a nested JSON array
+    QJsonArray shipsArray;
+    for (int i = 0; i < 10; ++i) {
+        QJsonArray rowArray;
+        for (int j = 0; j < 10; ++j) {
+            rowArray.append(savedBoardState[i][j]);
+        }
+        shipsArray.append(rowArray);
+    }
+
+    requestJson["ships"] = shipsArray;
+    // Read and process the server's response
+    QByteArray responseData = sendRequest(requestJson, 3000);
+    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject responseObj = responseDoc.object();
+
+    QString status = responseObj["status"].toString();
+    QString message = responseObj["message"].toString();
+
+    if (status != "success") {
+        QMessageBox::critical(this, "Error", "Failed to submit arrangement: " + message);
+    }
 }
 
 void BattleshipBoard::printBoardState() {
     qDebug() << "Final Board State:";
-    for (int row = 0; row < 8; ++row) {
+    for (int row = 0; row < 10; ++row) {
         QString line;
-        for (int col = 0; col < 8; ++col) {
+        for (int col = 0; col < 10; ++col) {
             line += QString::number(playerBoard[row][col]->property("state").toInt()) + " ";
         }
         qDebug() << line;
     }
-}
-
-void BattleshipBoard::onReturnButtonClicked() {
-    QMessageBox::information(this, "Leave Game", "Leaving game room...");
-    resetBoardState();
-    stackedWidget->setCurrentIndex(3);
 }
 
 // Add Play Game Handler
@@ -289,9 +294,9 @@ void BattleshipBoard::onPlayGameClicked() {
 // Save the board state
 void BattleshipBoard::saveBoardState() {
     savedBoardState.clear(); // Clear any previous saved state
-    for (int row = 0; row < 8; ++row) {
+    for (int row = 0; row < 10; ++row) {
         QList<int> rowState;
-        for (int col = 0; col < 8; ++col) {
+        for (int col = 0; col < 10; ++col) {
             rowState.append(playerBoard[row][col]->property("state").toInt());
         }
         savedBoardState.append(rowState);
@@ -308,8 +313,51 @@ void BattleshipBoard::saveBoardState() {
     }
 }
 
-// Set user's token here
-void BattleshipBoard::setToken(const QString &newToken) {
-    token = newToken;
-    qDebug() << "Token set in CreateGameScreen:" << token;
+void BattleshipBoard::setUpAnnouncement(const QByteArray &message) {
+    QJsonDocument doc = QJsonDocument::fromJson(message);
+
+    if (!doc.isObject()) {
+        qWarning() << "Invalid JSON format!";
+        return;
+    }
+
+    QJsonObject jsonObject = doc.object();
+    if (jsonObject.contains("type") && jsonObject["type"].toString() == "SUBMIT_ARRANGEMENT") {
+        QString messageText = jsonObject["message"].toString();
+        // Create and show the popup
+        AnnouncementPopup *popup = new AnnouncementPopup(this);
+        popup->showPopup(messageText);
+    } else {
+        qDebug() << "Message type is not SUBMIT_ARRANGEMENT, ignoring.";
+    }
 }
+
+
+void BattleshipBoard::playGameRedirect(const QByteArray &message) {
+    QJsonDocument doc = QJsonDocument::fromJson(message);
+    qDebug() << "Play Game message: ";
+    if (!doc.isObject()) {
+        qWarning() << "Invalid JSON format!";
+        return;
+    }
+
+    QJsonObject jsonObject = doc.object();
+    if (jsonObject.contains("type") && jsonObject["type"].toString() == "GAME_START") {
+        qDebug() << message;
+        // Handle game start here
+        saveBoardState();
+        qDebug() << "Game Board Saved.";
+
+        GameBoard *playgameboard = dynamic_cast<GameBoard *>(stackedWidget->widget(8));
+        if (playgameboard) {
+            playgameboard->setToken(globalUserToken); // Pass the token dynamically
+            playgameboard->setInitialState(savedBoardState);
+            playgameboard->displayInitialState();
+        }
+        stackedWidget->setCurrentIndex(8);
+    } else {
+        qDebug() << "Message type is not GAME_START, ignoring.";
+    }
+}
+
+

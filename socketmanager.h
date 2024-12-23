@@ -4,6 +4,9 @@
 #include <QTcpSocket>
 #include <QObject>
 #include <QString>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 class SocketManager : public QObject {
     Q_OBJECT

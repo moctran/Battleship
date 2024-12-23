@@ -1,6 +1,7 @@
 #ifndef LOGINSCREEN_H
 #define LOGINSCREEN_H
 
+#include <basescreen.h>
 #include <QWidget>
 #include <QLineEdit>
 #include <QPushButton>
@@ -8,7 +9,7 @@
 #include <QStackedWidget>
 #include <QTcpSocket>
 
-class LoginScreen : public QWidget {
+class LoginScreen : public baseScreen {
     Q_OBJECT
 
 public:

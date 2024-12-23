@@ -32,7 +32,7 @@ void SocketManager::connectToServer(const QString& host, quint16 port) {
     if (socket->state() == QTcpSocket::UnconnectedState) {
         socket->connectToHost(host, port);
         // Wait for connection
-        if (!socket->waitForConnected(5000)) { // 5000 ms timeout
+        if (!socket->waitForConnected(60000)) { // 5000 ms timeout
             qDebug() << "Failed to connect to server:" << socket->errorString();
             emit errorOccurred("Failed to connect to server: " + socket->errorString());
         } else {
@@ -94,3 +94,4 @@ void SocketManager::printSocketInfo() const {
         qDebug() << "  Last Error: None";
     }
 }
+

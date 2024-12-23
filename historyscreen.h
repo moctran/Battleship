@@ -8,8 +8,9 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QTcpSocket>
+#include "basescreen.h"
 
-class HistoryScreen : public QWidget {
+class HistoryScreen : public baseScreen {
     Q_OBJECT
 
 public:

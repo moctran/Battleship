@@ -9,11 +9,11 @@
 #include "battleshipboard.h"
 #include "gameboard.h"
 #include <QString>
+#include "testScreen.h"
 QString globalUserToken;
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-
     QStackedWidget stackedWidget;
 
     // Create screens
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 
     BattleshipBoard *setupgameBoard = new BattleshipBoard(&stackedWidget); // Set up board
     GameBoard *gameBoard = new GameBoard(&stackedWidget);
-
+    TestScreen *testScreen = new TestScreen(&stackedWidget);
     // Add screens to the stacked widget
     stackedWidget.addWidget(initialScreen); // Index 0
     stackedWidget.addWidget(loginScreen);   // Index 1
@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
     stackedWidget.addWidget(historyScreen); // Add History Screen at an appropriate index (6)
     stackedWidget.addWidget(setupgameBoard); // Index 7
     stackedWidget.addWidget(gameBoard); // Index 8
+    stackedWidget.addWidget(testScreen); // Index 9
     stackedWidget.setCurrentWidget(initialScreen);
     stackedWidget.show();
 

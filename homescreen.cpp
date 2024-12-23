@@ -1,6 +1,7 @@
 #include "homescreen.h"
 #include "historyscreen.h"
 #include "creategameroom.h"
+#include "joingameroom.h"
 #include <QMessageBox>
 #include <QDebug>
 #include <QTcpSocket>
@@ -12,13 +13,14 @@
 extern QString globalUserToken;
 
 HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
-    : QWidget(parent), stackedWidget(stackedWidget) {
+    : baseScreen(parent), stackedWidget(stackedWidget) {
 
     joinGameRoomButton = new QPushButton("Join Game Room", this);
     createGameRoomButton = new QPushButton("Create Game Room", this);
     leaderboardButton = new QPushButton("Leaderboard", this);
     historyButton = new QPushButton("History", this);
     logOutButton = new QPushButton("Log Out", this);
+    testButton = new QPushButton("Test", this);
 
     layout = new QVBoxLayout(this);
     layout->addWidget(new QLabel("Home Screen", this));
@@ -27,6 +29,7 @@ HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     layout->addWidget(leaderboardButton);
     layout->addWidget(historyButton);
     layout->addWidget(logOutButton);
+    layout->addWidget(testButton);
     setLayout(layout);
 
     connect(joinGameRoomButton, &QPushButton::clicked, this, &HomeScreen::onJoinGameRoomClicked);
@@ -34,9 +37,14 @@ HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     connect(leaderboardButton, &QPushButton::clicked, this, &HomeScreen::onLeaderboardClicked);
     connect(historyButton, &QPushButton::clicked, this, &HomeScreen::onHistoryClicked);
     connect(logOutButton, &QPushButton::clicked, this, &HomeScreen::onLogOutClicked);
+    connect(testButton, &QPushButton::clicked, this, &HomeScreen::onTestClicked);
 }
 
 void HomeScreen::onJoinGameRoomClicked() {
+    JoinGameRoom *joinGameScreen = dynamic_cast<JoinGameRoom *>(stackedWidget->widget(4)); // Index 4
+    if (joinGameScreen) {
+        joinGameScreen->setToken(globalUserToken); // Pass the token dynamically
+    }
     stackedWidget->setCurrentIndex(4); // Navigate to Join Game Room Screen
 }
 
@@ -54,7 +62,7 @@ void HomeScreen::onCreateGameRoomClicked() {
         qDebug() << "Generated Room ID: " << roomId;
         createGameRoom->setRoomID(roomId);
         createGameRoom->displayRoomID();
-
+        createGameRoom->populateOnlinePlayers();
         // Navigate to Create Game Room Screen only if RoomID generation succeeds
         stackedWidget->setCurrentIndex(5);
     }
@@ -79,40 +87,15 @@ void HomeScreen::onLogOutClicked() {
 
 
 void HomeScreen::HandleLoggedOut() {
-    QTcpSocket socket;
-    socket.connectToHost("127.0.0.1", 8080);
+    QJsonObject requestJson;
+    requestJson["type"] = "logout";
+    requestJson["token"] = globalUserToken;
 
-    if (!socket.waitForConnected(3000)) {
-        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
-        return;
-    }
-
-    QJsonObject json;
-    json["type"] = "logout";
-    json["token"] = globalUserToken;
-    QJsonDocument doc(json);
-    QByteArray data = doc.toJson();
-
-    if (socket.write(data) == -1) {
-        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
-        return;
-    }
-
-    if (!socket.waitForBytesWritten(3000)) {
-        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
-        return;
-    }
-
-    if (!socket.waitForReadyRead(3000)) {
-        QMessageBox::critical(this, "Error", "No response from the server.");
-        return;
-    }
-
-    QByteArray responseData = socket.readAll();
+    QByteArray responseData = sendRequest(requestJson, 3000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
-    qDebug() << "Server response for view_profile:" << responseData;
+    qDebug() << "Server response for log out:" << responseData;
 
     if (responseObj["status"].toString() == "success") {
         QMessageBox::information(this, "Logout Successful", "You have logged out from the game.");
@@ -121,6 +104,10 @@ void HomeScreen::HandleLoggedOut() {
         QString errorMessage = responseObj["message"].toString();
         QMessageBox::critical(this, "Logout Failed", errorMessage);
     }
+}
+
+void HomeScreen::onTestClicked() {
+    stackedWidget->setCurrentIndex(9); //
 }
 
 
