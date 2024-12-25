@@ -11,6 +11,8 @@
 #include <QApplication>
 
 extern QString globalUserToken;
+extern QString globalUserId;
+extern QString globalUserName;
 
 HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     : baseScreen(parent), stackedWidget(stackedWidget) {
@@ -44,6 +46,8 @@ void HomeScreen::onJoinGameRoomClicked() {
     JoinGameRoom *joinGameScreen = dynamic_cast<JoinGameRoom *>(stackedWidget->widget(4)); // Index 4
     if (joinGameScreen) {
         joinGameScreen->setToken(globalUserToken); // Pass the token dynamically
+        joinGameScreen->setId(globalUserId);
+        joinGameScreen->setName(globalUserName);
     }
     stackedWidget->setCurrentIndex(4); // Navigate to Join Game Room Screen
 }
@@ -52,6 +56,8 @@ void HomeScreen::onCreateGameRoomClicked() {
     CreateGameRoom *createGameRoom = dynamic_cast<CreateGameRoom *>(stackedWidget->widget(5)); // Index 5
     if (createGameRoom) {
         createGameRoom->setToken(globalUserToken); // Pass the token dynamically
+        createGameRoom->setId(globalUserId);
+        createGameRoom->setName(globalUserName);
         QString roomId = createGameRoom->generateRoomID();
 
         if (roomId.isEmpty() || roomId == "failed") {

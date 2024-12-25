@@ -79,3 +79,7 @@ QString BaseGameScreen::getColour(int index) {
     return QString();
 }
 
+void BaseGameScreen::setFirstPlayerStatus(bool check) {
+    isFirstPlayer = check;
+    qDebug() << "First player?" << isFirstPlayer;
+}

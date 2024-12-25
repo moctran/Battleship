@@ -8,6 +8,8 @@
 #include <QDebug>
 
 extern QString globalUserToken;
+extern QString globalUserId;
+extern QString globalUserName;
 
 CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     : BaseGameScreen(stackedWidget, parent), stackedWidget(stackedWidget) {
@@ -76,6 +78,8 @@ void CreateGameRoom::onStartGameClicked() {
         BattleshipBoard *setupBoard = dynamic_cast<BattleshipBoard *>(stackedWidget->widget(7)); // Index 7
         if (setupBoard) {
             setupBoard->setToken(globalUserToken); // Pass the token dynamically
+            setupBoard->setId(globalUserId);
+            setupBoard->setName(globalUserName);
         }
         // Redirect to the game setup screen
         stackedWidget->setCurrentIndex(7);
@@ -273,6 +277,8 @@ void CreateGameRoom::onSetUpRedirect(const QByteArray &message) {
         BattleshipBoard *setupBoard = dynamic_cast<BattleshipBoard *>(stackedWidget->widget(7)); // Index 7
         if (setupBoard) {
             setupBoard->setToken(globalUserToken); // Pass the token dynamically
+            setupBoard->setId(globalUserId);
+            setupBoard->setName(globalUserName);
         }
         // Redirect to the game setup screen
         stackedWidget->setCurrentIndex(7);

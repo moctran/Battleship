@@ -13,7 +13,11 @@ public:
     explicit baseScreen(QWidget *parent = nullptr);
     QByteArray sendRequest(const QJsonObject &requestData, int timeout);
     QString token;
+    QString userId;
+    QString userName;
     void setToken(const QString &newToken); // Set token dynamically
+    void setId(const QString &newId);
+    void setName(const QString &newName);
 signals:
 
 private:
