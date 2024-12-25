@@ -58,6 +58,7 @@ SOURCES       = ../../announcementpopup.cpp \
 		../../battleshipboard.cpp \
 		../../creategameroom.cpp \
 		../../gameboard.cpp \
+		../../gameresultscreen.cpp \
 		../../historyscreen.cpp \
 		../../homescreen.cpp \
 		../../initialscreen.cpp \
@@ -72,6 +73,7 @@ SOURCES       = ../../announcementpopup.cpp \
 		moc_battleshipboard.cpp \
 		moc_creategameroom.cpp \
 		moc_gameboard.cpp \
+		moc_gameresultscreen.cpp \
 		moc_historyscreen.cpp \
 		moc_homescreen.cpp \
 		moc_initialscreen.cpp \
@@ -86,6 +88,7 @@ OBJECTS       = announcementpopup.o \
 		battleshipboard.o \
 		creategameroom.o \
 		gameboard.o \
+		gameresultscreen.o \
 		historyscreen.o \
 		homescreen.o \
 		initialscreen.o \
@@ -101,6 +104,7 @@ OBJECTS       = announcementpopup.o \
 		moc_battleshipboard.o \
 		moc_creategameroom.o \
 		moc_gameboard.o \
+		moc_gameresultscreen.o \
 		moc_historyscreen.o \
 		moc_homescreen.o \
 		moc_initialscreen.o \
@@ -326,6 +330,7 @@ DIST          = /Qt/6.8.0/macos/mkspecs/features/spec_pre.prf \
 		../../battleshipboard.h \
 		../../creategameroom.h \
 		../../gameboard.h \
+		../../gameresultscreen.h \
 		../../historyscreen.h \
 		../../homescreen.h \
 		../../initialscreen.h \
@@ -339,6 +344,7 @@ DIST          = /Qt/6.8.0/macos/mkspecs/features/spec_pre.prf \
 		../../battleshipboard.cpp \
 		../../creategameroom.cpp \
 		../../gameboard.cpp \
+		../../gameresultscreen.cpp \
 		../../historyscreen.cpp \
 		../../homescreen.cpp \
 		../../initialscreen.cpp \
@@ -829,8 +835,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../../announcementpopup.h ../../basegamescreen.h ../../basescreen.h ../../battleshipboard.h ../../creategameroom.h ../../gameboard.h ../../historyscreen.h ../../homescreen.h ../../initialscreen.h ../../joingameroom.h ../../loginscreen.h ../../signupscreen.h ../../socketmanager.h ../../testScreen.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../announcementpopup.cpp ../../basegamescreen.cpp ../../basescreen.cpp ../../battleshipboard.cpp ../../creategameroom.cpp ../../gameboard.cpp ../../historyscreen.cpp ../../homescreen.cpp ../../initialscreen.cpp ../../joingameroom.cpp ../../loginscreen.cpp ../../main.cpp ../../signupscreen.cpp ../../socketmanager.cpp ../../testScreen.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../announcementpopup.h ../../basegamescreen.h ../../basescreen.h ../../battleshipboard.h ../../creategameroom.h ../../gameboard.h ../../gameresultscreen.h ../../historyscreen.h ../../homescreen.h ../../initialscreen.h ../../joingameroom.h ../../loginscreen.h ../../signupscreen.h ../../socketmanager.h ../../testScreen.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../announcementpopup.cpp ../../basegamescreen.cpp ../../basescreen.cpp ../../battleshipboard.cpp ../../creategameroom.cpp ../../gameboard.cpp ../../gameresultscreen.cpp ../../historyscreen.cpp ../../homescreen.cpp ../../initialscreen.cpp ../../joingameroom.cpp ../../loginscreen.cpp ../../main.cpp ../../signupscreen.cpp ../../socketmanager.cpp ../../testScreen.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -859,9 +865,9 @@ benchmark: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_announcementpopup.cpp moc_basegamescreen.cpp moc_basescreen.cpp moc_battleshipboard.cpp moc_creategameroom.cpp moc_gameboard.cpp moc_historyscreen.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp moc_socketmanager.cpp moc_testScreen.cpp
+compiler_moc_header_make_all: moc_announcementpopup.cpp moc_basegamescreen.cpp moc_basescreen.cpp moc_battleshipboard.cpp moc_creategameroom.cpp moc_gameboard.cpp moc_gameresultscreen.cpp moc_historyscreen.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp moc_socketmanager.cpp moc_testScreen.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_announcementpopup.cpp moc_basegamescreen.cpp moc_basescreen.cpp moc_battleshipboard.cpp moc_creategameroom.cpp moc_gameboard.cpp moc_historyscreen.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp moc_socketmanager.cpp moc_testScreen.cpp
+	-$(DEL_FILE) moc_announcementpopup.cpp moc_basegamescreen.cpp moc_basescreen.cpp moc_battleshipboard.cpp moc_creategameroom.cpp moc_gameboard.cpp moc_gameresultscreen.cpp moc_historyscreen.cpp moc_homescreen.cpp moc_initialscreen.cpp moc_joingameroom.cpp moc_loginscreen.cpp moc_signupscreen.cpp moc_socketmanager.cpp moc_testScreen.cpp
 moc_announcementpopup.cpp: ../../announcementpopup.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
@@ -1010,6 +1016,16 @@ moc_gameboard.cpp: ../../gameboard.h \
 		../../basescreen.h \
 		../../../Qt/6.8.0/macos/libexec/moc
 	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../gameboard.h -o moc_gameboard.cpp
+
+moc_gameresultscreen.cpp: ../../gameresultscreen.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
+		../../../Qt/6.8.0/macos/libexec/moc
+	/Users/moctran/Qt/6.8.0/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=16 -D__clang_minor__=0 -D__clang_patchlevel__=0 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/moctran/Qt/6.8.0/macos/mkspecs/macx-clang -I/Users/moctran/BattleShipTest -I/Users/moctran/Qt/6.8.0/macos/lib/QtWidgets.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtGui.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtNetwork.framework/Headers -I/Users/moctran/Qt/6.8.0/macos/lib/QtCore.framework/Headers -I. -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -F/Users/moctran/Qt/6.8.0/macos/lib ../../gameresultscreen.h -o moc_gameresultscreen.cpp
 
 moc_historyscreen.cpp: ../../historyscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
@@ -1194,8 +1210,14 @@ announcementpopup.o: ../../announcementpopup.cpp ../../announcementpopup.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qgraphicseffect.h \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QPropertyAnimation \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qpropertyanimation.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QApplication \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qapplication.h \
+		../../../Qt/6.8.0/macos/lib/QtGui.framework/Headers/QScreen \
+		../../../Qt/6.8.0/macos/lib/QtGui.framework/Headers/qscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QVBoxLayout \
-		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qboxlayout.h
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qboxlayout.h \
+		../../../Qt/6.8.0/macos/lib/QtGui.framework/Headers/QFontMetrics \
+		../../../Qt/6.8.0/macos/lib/QtGui.framework/Headers/qfontmetrics.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o announcementpopup.o ../../announcementpopup.cpp
 
 basegamescreen.o: ../../basegamescreen.cpp ../../basegamescreen.h \
@@ -1367,9 +1389,28 @@ gameboard.o: ../../gameboard.cpp ../../gameboard.h \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsonobject.h \
 		../../basegamescreen.h \
 		../../basescreen.h \
+		../../gameresultscreen.h \
+		../../socketmanager.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QObject \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qobject.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QString \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qstring.h \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QJsonArray \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qjsonarray.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o gameboard.o ../../gameboard.cpp
+
+gameresultscreen.o: ../../gameresultscreen.cpp ../../gameresultscreen.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QStackedWidget \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qstackedwidget.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QLabel \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qlabel.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QVBoxLayout \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qboxlayout.h \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QPushButton \
+		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qpushbutton.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o gameresultscreen.o ../../gameresultscreen.cpp
 
 historyscreen.o: ../../historyscreen.cpp ../../historyscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
@@ -1525,6 +1566,8 @@ loginscreen.o: ../../loginscreen.cpp ../../loginscreen.h \
 
 main.o: ../../main.cpp ../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QApplication \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qapplication.h \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QString \
+		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qstring.h \
 		../../initialscreen.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QWidget \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qwidget.h \
@@ -1580,15 +1623,14 @@ main.o: ../../main.cpp ../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/Q
 		../../socketmanager.h \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QObject \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qobject.h \
-		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QString \
-		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qstring.h \
 		../../announcementpopup.h \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/QGraphicsOpacityEffect \
 		../../../Qt/6.8.0/macos/lib/QtWidgets.framework/Headers/qgraphicseffect.h \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/QPropertyAnimation \
 		../../../Qt/6.8.0/macos/lib/QtCore.framework/Headers/qpropertyanimation.h \
 		../../gameboard.h \
-		../../testScreen.h
+		../../testScreen.h \
+		../../gameresultscreen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../main.cpp
 
 signupscreen.o: ../../signupscreen.cpp ../../signupscreen.h \
@@ -1664,6 +1706,9 @@ moc_creategameroom.o: moc_creategameroom.cpp
 
 moc_gameboard.o: moc_gameboard.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_gameboard.o moc_gameboard.cpp
+
+moc_gameresultscreen.o: moc_gameresultscreen.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_gameresultscreen.o moc_gameresultscreen.cpp
 
 moc_historyscreen.o: moc_historyscreen.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_historyscreen.o moc_historyscreen.cpp

@@ -29,7 +29,7 @@ public:
     void populateOnlinePlayers(); // Function to populate online players list
     void displayOnlinePlayers(std::vector<Player>& players);
     void updateLabels(const QString player1Name, const QString player2Name);
-    void sendJoinRoomRequest(const QString &invitedRoomId, const QString &firstPlayerId, const QString &secondPlayerId);
+    void sendJoinRoomRequest(const QString &invitedRoomId);
 private slots:
     void onStartGameClicked();
     void onBackClicked();
