@@ -29,13 +29,15 @@ public:
     void populateOnlinePlayers(); // Function to populate online players list
     void displayOnlinePlayers(std::vector<Player>& players);
     void updateLabels(const QString player1Name, const QString player2Name);
-
+    void sendJoinRoomRequest(const QString &invitedRoomId, const QString &firstPlayerId, const QString &secondPlayerId);
 private slots:
     void onStartGameClicked();
     void onBackClicked();
     void onSendInviteClicked();
     void onPlayerChanges(const QByteArray &message);
     void onSetUpRedirect(const QByteArray &message);
+    // Handles game invitations
+    void onInvitationReceived(const QByteArray &message);
 
 private:
     QLabel *player1Label;
@@ -47,6 +49,8 @@ private:
     QVBoxLayout *mainLayout;
     QStackedWidget *stackedWidget;
     QString roomID;
+    // New method for handling leave room request
+   void sendLeaveRoomRequest(std::function<void(bool)> callback);
 };
 
 #endif // CREATEGAMEROOM_H

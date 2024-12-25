@@ -49,6 +49,7 @@ CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     SocketManager* socketManager = SocketManager::getInstance();
     connect(socketManager, &SocketManager::messageReceived, this, &CreateGameRoom::onPlayerChanges);
     connect(socketManager, &SocketManager::messageReceived, this, &CreateGameRoom::onSetUpRedirect);
+    connect(socketManager, &SocketManager::messageReceived, this, &CreateGameRoom::onInvitationReceived);
 }
 
 // Redirect to set up ship screen
@@ -288,4 +289,151 @@ void CreateGameRoom::updateLabels(const QString player1Name, const QString playe
     qDebug() << "Updated Labels:";
     qDebug() << "First Player: " << player1Name;
     qDebug() << "Second Player: " << player2Name;
+}
+
+void CreateGameRoom::onInvitationReceived(const QByteArray &message) {
+    if (stackedWidget->currentWidget() != this) {
+        return;
+    }
+    QJsonDocument doc = QJsonDocument::fromJson(message);
+    if (!doc.isObject()) return;
+
+    QJsonObject json = doc.object();
+    if (json["type"] == "INVITATION") {
+        QJsonObject data = json["data"].toObject();
+        QString invitedRoomId = data["id"].toString();
+        QString firstPlayerId = data["firstPlayerId"].toString();
+        QString secondPlayerId = data["secondPlayerId"].toString();
+
+        // Create a unique QMessageBox for this screen
+        QMessageBox *dialog = new QMessageBox(this);
+        dialog->setWindowTitle("Game Invitation");
+        dialog->setText(QString("Do you want to join the game room created by Player %1?").arg(firstPlayerId));
+        dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+        // Disconnect any previous connections (if needed)
+        disconnect(dialog, &QMessageBox::finished, nullptr, nullptr);
+
+        // Handle user's response to the invitation
+        connect(dialog, &QMessageBox::finished, this, [this, dialog, invitedRoomId, firstPlayerId, secondPlayerId](int result) {
+            dialog->deleteLater(); // Clean up the dialog
+
+            if (result == QMessageBox::Yes) {
+                qDebug() << "User accepted the invitation in CreateGameRoom. Proceeding to leave the current room.";
+
+                // Check if the user is in a room
+                if (roomID.isEmpty()) {
+                    qDebug() << "No current room to leave. Proceeding to join new room...";
+                    sendJoinRoomRequest(invitedRoomId, firstPlayerId, secondPlayerId);
+                } else {
+                    sendLeaveRoomRequest([this, invitedRoomId, firstPlayerId, secondPlayerId](bool success) {
+                        if (success) {
+                            sendJoinRoomRequest(invitedRoomId, firstPlayerId, secondPlayerId);
+                        } else {
+                            QMessageBox::critical(this, "Error", "Failed to leave the current room.");
+                        }
+                    });
+                }
+            } else {
+                qDebug() << "User declined the invitation in CreateGameRoom.";
+            }
+        });
+
+        dialog->show();
+    }
+}
+
+void CreateGameRoom::sendLeaveRoomRequest(std::function<void(bool)> callback) {
+    QJsonObject leaveRequest;
+    leaveRequest["type"] = "leave_room";
+    leaveRequest["token"] = globalUserToken;
+
+    QByteArray leaveData = QJsonDocument(leaveRequest).toJson(QJsonDocument::Compact);
+
+    // Log the leave room message
+    qDebug() << "Leave Room Request Message:" << leaveData;
+
+    QTcpSocket *socket = new QTcpSocket(this);
+    connect(socket, &QTcpSocket::connected, this, [socket, leaveData]() {
+        socket->write(leaveData);
+        socket->flush();
+    });
+
+    connect(socket, &QTcpSocket::readyRead, this, [socket, callback]() {
+        QByteArray response = socket->readAll();
+        socket->close();
+        socket->deleteLater();
+
+        QJsonDocument responseDoc = QJsonDocument::fromJson(response);
+        if (!responseDoc.isObject()) {
+            qWarning() << "Invalid response received for leave_room.";
+            callback(false);
+            return;
+        }
+
+        QJsonObject responseObj = responseDoc.object();
+        if (responseObj["status"].toString() == "success") {
+            qDebug() << "Successfully left the room.";
+            callback(true);
+        } else {
+            QString errorMessage = responseObj["message"].toString();
+            qWarning() << "Failed to leave the room: " << errorMessage;
+            callback(false);
+        }
+    });
+
+    connect(socket, &QTcpSocket::errorOccurred, this, [socket, callback](QAbstractSocket::SocketError) {
+        qWarning() << "Socket error occurred while leaving room: " << socket->errorString();
+        socket->deleteLater();
+        callback(false);
+    });
+
+    socket->connectToHost("127.0.0.1", 8080); // Replace with your server's details
+}
+
+void CreateGameRoom::sendJoinRoomRequest(const QString &invitedRoomId, const QString &firstPlayerId, const QString &secondPlayerId) {
+    QJsonObject joinRequest;
+    joinRequest["type"] = "join_room";
+    joinRequest["token"] = globalUserToken;
+    joinRequest["room_id"] = invitedRoomId;
+
+    QByteArray joinData = QJsonDocument(joinRequest).toJson(QJsonDocument::Compact);
+
+    QTcpSocket *socket = new QTcpSocket(this);
+    connect(socket, &QTcpSocket::connected, this, [socket, joinData]() {
+        socket->write(joinData);
+        socket->flush();
+    });
+
+    connect(socket, &QTcpSocket::readyRead, this, [socket, this, invitedRoomId, firstPlayerId, secondPlayerId]() {
+        QByteArray response = socket->readAll();
+        socket->close();
+        socket->deleteLater();
+
+        QJsonDocument responseDoc = QJsonDocument::fromJson(response);
+        if (!responseDoc.isObject()) {
+            qWarning() << "Invalid response received for join_room.";
+            return;
+        }
+
+        QJsonObject responseObj = responseDoc.object();
+        if (responseObj["status"].toString() == "success") {
+            qDebug() << "Successfully joined the room. Updating UI...";
+            setRoomID(invitedRoomId);
+            updateLabels(firstPlayerId, secondPlayerId);
+            populateOnlinePlayers();
+            displayRoomID();
+            QMessageBox::information(this, "Room Joined", QString("You have joined room %1").arg(invitedRoomId));
+        } else {
+            QString errorMessage = responseObj["message"].toString();
+            QMessageBox::critical(this, "Error", "Failed to join room: " + errorMessage);
+        }
+    });
+
+    connect(socket, &QTcpSocket::errorOccurred, this, [socket](QAbstractSocket::SocketError) {
+        qWarning() << "Socket error occurred while joining room: " << socket->errorString();
+        socket->deleteLater();
+    });
+
+    socket->connectToHost("127.0.0.1", 8080); // Replace with your server's details
 }
