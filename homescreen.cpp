@@ -2,6 +2,7 @@
 #include "historyscreen.h"
 #include "creategameroom.h"
 #include "joingameroom.h"
+#include "SocketManager.h"
 #include <QMessageBox>
 #include <QDebug>
 #include <QTcpSocket>
@@ -40,6 +41,11 @@ HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     connect(historyButton, &QPushButton::clicked, this, &HomeScreen::onHistoryClicked);
     connect(logOutButton, &QPushButton::clicked, this, &HomeScreen::onLogOutClicked);
     connect(testButton, &QPushButton::clicked, this, &HomeScreen::onTestClicked);
+
+    // Connect to SocketManager's signal
+    SocketManager *socketManager = SocketManager::getInstance();
+    connect(socketManager, &SocketManager::messageReceived,
+            this, &HomeScreen::onInvitationReceived);
 }
 
 void HomeScreen::onJoinGameRoomClicked() {
@@ -116,6 +122,124 @@ void HomeScreen::onTestClicked() {
     stackedWidget->setCurrentIndex(9); //
 }
 
+void HomeScreen::onInvitationReceived(const QByteArray &message) {
+    if (stackedWidget->currentWidget() != this) {
+        return;
+    }
+    QJsonDocument doc = QJsonDocument::fromJson(message);
+    if (!doc.isObject()) {
+        qWarning() << "Invalid message format received.";
+        return;
+    }
 
+    QJsonObject json = doc.object();
+    if (json["type"] != "INVITATION") {
+        qWarning() << "Message is not an invitation. Ignoring.";
+        return;
+    }
 
+    // Extract data from the invitation
+    QJsonObject data = json["data"].toObject();
+    QString roomId = data["id"].toString();
+    QString firstPlayerId = data["firstPlayerId"].toString();
+    QString secondPlayerId = data["secondPlayerId"].toString();
 
+    // Create a unique QMessageBox for HomeScreen
+    QMessageBox *dialog = new QMessageBox(this);
+    dialog->setWindowTitle("Game Invitation");
+    dialog->setText(QString("Do you want to join the game room created by Player %1?").arg(firstPlayerId));
+    dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    dialog->setDefaultButton(QMessageBox::No);
+
+    // Connect dialog finished signal
+    QMetaObject::Connection connection;
+    connection = connect(dialog, &QMessageBox::finished, this, [this, dialog, roomId, firstPlayerId, secondPlayerId, connection](int result) {
+        // Disconnect the dialog's finished signal to ensure no further connections persist
+        disconnect(connection);
+        dialog->deleteLater(); // Clean up the dialog after it's closed
+
+        if (result == QMessageBox::Yes) {
+            if (globalUserToken.isEmpty()) {
+                QMessageBox::critical(this, "Error", "Token is not set. Please log in again.");
+                return;
+            }
+
+            // Prepare the "join_room" request
+            QJsonObject joinRequest;
+            joinRequest["type"] = "join_room";
+            joinRequest["token"] = globalUserToken;
+            joinRequest["room_id"] = roomId;
+
+            QJsonDocument joinDoc(joinRequest);
+            QByteArray joinData = joinDoc.toJson(QJsonDocument::Compact);
+
+            // Log the request for debugging
+            qDebug() << "Sending join_room request: " << joinData;
+
+            // Create a new QTcpSocket for the request
+            QTcpSocket *socket = new QTcpSocket(this);
+            connect(socket, &QTcpSocket::connected, this, [socket, joinData]() {
+                socket->write(joinData);
+                socket->flush();
+                qDebug() << "Join room request sent.";
+            });
+
+            connect(socket, &QTcpSocket::readyRead, this, [socket, this, roomId, firstPlayerId, secondPlayerId]() {
+                QByteArray response = socket->readAll();
+                socket->close();
+                socket->deleteLater();
+
+                // Handle server response
+                QJsonDocument responseDoc = QJsonDocument::fromJson(response);
+                if (!responseDoc.isObject()) {
+                    QMessageBox::critical(this, "Error", "Invalid response received from the server.");
+                    return;
+                }
+
+                QJsonObject responseObj = responseDoc.object();
+                qDebug() << "Server response for join_room: " << response;
+
+                if (responseObj["status"].toString() == "success") {
+                    qDebug() << "Successfully joined the room. Navigating to CreateGameRoom screen.";
+
+                    // Navigate to the CreateGameRoom screen
+                    CreateGameRoom *createGameRoom = dynamic_cast<CreateGameRoom *>(stackedWidget->widget(5)); // Adjust index if needed
+                    if (createGameRoom) {
+                        // Pass token and room ID
+                        createGameRoom->setToken(globalUserToken);
+                        createGameRoom->setRoomID(roomId);
+
+                        // Update labels dynamically (using IDs from the message)
+                        createGameRoom->updateLabels(firstPlayerId, secondPlayerId);
+
+                        // Populate online players
+                        createGameRoom->populateOnlinePlayers();
+
+                        // Display room ID
+                        createGameRoom->displayRoomID();
+                    }
+
+                    // Set current index to CreateGameRoom
+                    stackedWidget->setCurrentIndex(5);
+
+                } else {
+                    QString errorMessage = responseObj["message"].toString();
+                    QMessageBox::critical(this, "Error", "Failed to join the room: " + errorMessage);
+                }
+            });
+
+            connect(socket, &QTcpSocket::errorOccurred, this, [socket]() {
+                qWarning() << "Socket error occurred: " << socket->errorString();
+                socket->deleteLater();
+                QMessageBox::critical(nullptr, "Error", "Failed to connect to the server.");
+            });
+
+            // Connect to the server
+            socket->connectToHost("127.0.0.1", 8080);
+        } else {
+            qDebug() << "User declined the invitation.";
+        }
+    });
+
+    dialog->show();
+}

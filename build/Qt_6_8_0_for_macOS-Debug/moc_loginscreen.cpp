@@ -71,7 +71,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSLoginScreenENDCLASS[] = {
 };
 
 Q_CONSTINIT const QMetaObject LoginScreen::staticMetaObject = { {
-    QMetaObject::SuperData::link<QWidget::staticMetaObject>(),
+    QMetaObject::SuperData::link<baseScreen::staticMetaObject>(),
     qt_meta_stringdata_CLASSLoginScreenENDCLASS.offsetsAndSizes,
     qt_meta_data_CLASSLoginScreenENDCLASS,
     qt_static_metacall,
@@ -111,12 +111,12 @@ void *LoginScreen::qt_metacast(const char *_clname)
     if (!_clname) return nullptr;
     if (!strcmp(_clname, qt_meta_stringdata_CLASSLoginScreenENDCLASS.stringdata0))
         return static_cast<void*>(this);
-    return QWidget::qt_metacast(_clname);
+    return baseScreen::qt_metacast(_clname);
 }
 
 int LoginScreen::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QWidget::qt_metacall(_c, _id, _a);
+    _id = baseScreen::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {

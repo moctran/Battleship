@@ -22,6 +22,7 @@ private slots:
     void onLogOutClicked();
     void onTestClicked();
     void HandleLoggedOut();
+    void onInvitationReceived(const QByteArray &message); // Slot
 
 private:
     QPushButton *joinGameRoomButton;
