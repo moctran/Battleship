@@ -6,6 +6,8 @@
 #include <socketmanager.h>
 
 extern QString globalUserToken;
+extern QString globalUserId;
+extern QString globalUserName;
 
 LoginScreen::LoginScreen(QStackedWidget *stackedWidget, QWidget *parent)
     : baseScreen(parent), stackedWidget(stackedWidget) {
@@ -50,11 +52,15 @@ void LoginScreen::onLoginButtonClicked() {
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
+    qDebug() << "Login message received: " << responseData;
     if (responseObj["status"].toString() == "success") {
         QJsonObject dataObj = responseObj["data"].toObject();
         globalUserToken = dataObj["token"].toString();
-
+        globalUserId = dataObj["userid"].toString();
+        globalUserName = dataObj["username"].toString();
         // Debug: Log the token
+        qDebug() << "User ID:" << globalUserId;
+        qDebug() << "User Name:" << globalUserName;
         qDebug() << "Token received from server:" << globalUserToken;
 
         QMessageBox::information(this, "Login Successful", "You are now logged in.");

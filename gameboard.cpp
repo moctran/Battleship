@@ -1,10 +1,14 @@
 #include "gameboard.h"
+#include "gameresultscreen.h"
+#include "socketmanager.h"
 #include <QMessageBox>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDebug>
 extern QString globalUserToken;
+extern QString globalUserId;
+extern QString globalUserName;
 
 // Constructor
 GameBoard::GameBoard(QStackedWidget *stackedWidget, QWidget *parent)
@@ -32,17 +36,18 @@ GameBoard::GameBoard(QStackedWidget *stackedWidget, QWidget *parent)
     centerLayout->addWidget(gameTitle);
 
     // Return button
-    returnButton = new QPushButton("Return", this);
-    returnButton->setFixedSize(100, 40);
-    returnButton->setStyleSheet("font-size: 14px;");
-    centerLayout->addWidget(returnButton, 0, Qt::AlignCenter);
-    connect(returnButton, &QPushButton::clicked, this, &GameBoard::onReturnClicked);
+    resignButton = new QPushButton("Resign", this);
+    resignButton->setFixedSize(100, 40);
+    resignButton->setStyleSheet("font-size: 14px;");
+    centerLayout->addWidget(resignButton, 0, Qt::AlignCenter);
+    connect(resignButton, &QPushButton::clicked, this, &GameBoard::onResignClicked);
 
     // Make Move button
     makeMoveButton = new QPushButton("Make Move", this);
     makeMoveButton->setFixedSize(100, 40);
     makeMoveButton->setStyleSheet("font-size: 14px;");
     makeMoveButton->setEnabled(false); // Initially disabled
+    makeMoveButton->setVisible(false);
     centerLayout->addWidget(makeMoveButton, 0, Qt::AlignCenter);
     connect(makeMoveButton, &QPushButton::clicked, this, &GameBoard::onMakeMoveClicked);
 
@@ -63,10 +68,13 @@ GameBoard::GameBoard(QStackedWidget *stackedWidget, QWidget *parent)
     mainLayout->addLayout(opponentContainer);
 
     setLayout(mainLayout);
-    setMinimumSize(800, 600);
+    setMinimumSize(1000, 600);
 
     // Connect opponent board buttons to the click handler
     connectOpponentBoardButtons();
+    SocketManager* socketManager = SocketManager::getInstance();
+    connect(socketManager, &SocketManager::messageReceived, this, &GameBoard::onResignGameHanlde);
+    connect(socketManager, &SocketManager::messageReceived, this, &GameBoard::onMoveReceived);
 }
 
 // Create a board
@@ -139,71 +147,88 @@ void GameBoard::onMakeMoveClicked() {
 }
 
 void GameBoard::sendMoveRequest(int row, int col) {
-    /* QTcpSocket *socket = new QTcpSocket(this); // Use dynamic socket for signal-slot connections
-    socket->connectToHost("127.0.0.1", 8080);
-
-    // Check if connection to the server is successful
-    if (!socket->waitForConnected(3000)) {
-        QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
-        makeMoveButton->setEnabled(true); // Re-enable the button on failure
-        socket->deleteLater();
-        return;
-    }
-
-    // Prepare the JSON request
     QJsonObject requestJson;
     requestJson["type"] = "make_move";
     requestJson["token"] = token;
     requestJson["x"] = row;
     requestJson["y"] = col;
 
-    QJsonDocument requestDoc(requestJson);
-    QByteArray requestData = requestDoc.toJson();
+    QByteArray responseData = sendRequest(requestJson, 3000);
+    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject responseObj = responseDoc.object();
 
-    // Send the request to the server
-    socket->write(requestData);
-    if (!socket->waitForBytesWritten(3000)) {
-        QMessageBox::critical(this, "Error", "Failed to send data to the server.");
-        makeMoveButton->setEnabled(true); // Re-enable the button on failure
-        socket->deleteLater();
-        return;
-    }
+    QString status = responseObj["status"].toString();
+    QString message = responseObj["message"].toString();
 
-    // Connect to the readyRead signal to process the server's response asynchronously
-    connect(socket, &QTcpSocket::readyRead, this, [this, socket]() {
-        QByteArray responseData = socket->readAll();
-        QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
-        QJsonObject responseObj = responseDoc.object();
+    if (status == "success") {
+        QMessageBox::information(this, "Make a move", message);
+        makeMoveButton->setVisible(false);
 
-        qDebug() << "Move response:" << responseObj;
+        QJsonObject dataObject = responseObj["data"].toObject();
+        QString winnerID = dataObject["winnerId"].toString();
+        if (!winnerID.isEmpty()) {
+            QString firstPlayerId = dataObject["firstPlayerId"].toString();
+            QString secondPlayerId = dataObject["secondPlayerId"].toString();
+            QString loserId = (winnerID == firstPlayerId) ? secondPlayerId : firstPlayerId;
 
-        if (responseObj["status"] == "success") {
-            qDebug() << "Move confirmed by the server.";
-            makeMoveButton->setEnabled(true); // Re-enable the button for the next move
-        } else {
-            QMessageBox::warning(this, "Invalid Move", responseObj["message"].toString());
-            makeMoveButton->setEnabled(true); // Re-enable the button on failure
+            qDebug() << winnerID << loserId;
+            GameResultScreen *resultScreen = dynamic_cast<GameResultScreen *>(stackedWidget->widget(10));
+            if (resultScreen) {
+                resultScreen->setResults(winnerID, loserId);
+            }
+            resetBoards();
+            stackedWidget->setCurrentIndex(10);
         }
-
-        // Clean up the socket
-        socket->close();
-    });
-
-    // Handle socket errors
-    connect(socket, &QTcpSocket::errorOccurred, this, [this, socket]() {
-        QMessageBox::critical(this, "Error", "Failed to communicate with the server.");
-        makeMoveButton->setEnabled(true); // Re-enable the button on failure
-
-        // Clean up the socket
-        socket->close();
-    }); */
-    qDebug() << "To implement later...";
+    } else {
+        QMessageBox::critical(this, "Error", message);
+    }
+    qDebug() << responseData;
 }
 
-
 // Handle return button click
-void GameBoard::onReturnClicked() {
-    leaveRoom(token, stackedWidget);
+void GameBoard::onResignClicked() {
+    QJsonObject requestJson;
+    requestJson["type"] = "resign_game";
+    requestJson["token"] = token;
+
+    QByteArray responseData = sendRequest(requestJson, 3000);
+    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject responseObj = responseDoc.object();
+
+    // Debug the response
+    if (responseObj.contains("status") && responseObj["status"].toString() == "success") {
+        qDebug() << "Resign Successful:" << responseObj["message"].toString();
+        // Navigate to index 3 in the stacked widget
+        stackedWidget->setCurrentIndex(3);
+    } else {
+        QString errorMessage = responseObj.contains("message") ? responseObj["message"].toString() : "Unknown error";
+        qDebug() << "Resign Failed:" << errorMessage;
+        // Optionally show an error message to the user
+        QMessageBox::critical(this, "Resign Failed", errorMessage);
+    }
+}
+
+void GameBoard::onResignGameHanlde(const QByteArray &message) {
+    QJsonDocument doc = QJsonDocument::fromJson(message);
+    qDebug() << "Resign Game message: " << message;
+    if (!doc.isObject()) {
+        qWarning() << "Invalid JSON format!";
+        return;
+    }
+    // Get the root JSON object
+    QJsonObject jsonObject = doc.object();
+    if (jsonObject.contains("type") && jsonObject["type"].toString() == "GAME_RESIGN") {
+        if (jsonObject.contains("message")) {
+            QString messageText = jsonObject["message"].toString();
+            QMessageBox::information(this, "Room Players Change", messageText);
+            resetBoards();
+            stackedWidget->setCurrentIndex(3);
+        } else {
+            qWarning() << "'message' not found in JSON!";
+        }
+    } else {
+        qDebug() << "Message type is not GAME_RESIGN, ignoring.";
+    }
 }
 
 // Set the token
@@ -228,31 +253,95 @@ void GameBoard::displayInitialState() {
         int col_num = 0;
         for (int cell : row) {
             line += QString::number(cell) + " ";
-            // switch (cell) {
-            // case 1:
-            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: red;");
-            //     break;
-            // case 2:
-            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: orange;");
-            //     break;
-            // case 3:
-            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: yellow;");
-            //     break;
-            // case 4:
-            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: green;");
-            //     break;
-            // case 5:
-            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: blue;");
-            //     break;
-            // default:
-            //     playerBoard[row_num][col_num]->setStyleSheet("background-color: lightblue;");
-            //     break;
-            // }
             QString colour = getColour(cell);  // Get the color from the method
-            playerBoard[row_num][col_num]->setStyleSheet("border-color: " + colour + ";");
+            playerBoard[row_num][col_num]->setStyleSheet("background-color: " + colour + ";");
+            opponentBoard[row_num][col_num]->setStyleSheet("background-colour: lightblue");
             col_num += 1;
         }
         row_num += 1;
         qDebug() << line;
+    }
+}
+
+void GameBoard::firstMoveCheck(bool isFirstPlayer, bool isFirstPlayerTurn) {
+    if(isFirstPlayer == isFirstPlayerTurn) {
+        makeMoveButton->setVisible(true);
+    }
+}
+
+void GameBoard::onMoveReceived(const QByteArray &message) {
+    QJsonDocument doc = QJsonDocument::fromJson(message);
+    qDebug() << "Game move message: " << message;
+    if (!doc.isObject()) {
+        qWarning() << "Invalid JSON format!";
+        return;
+    }
+
+    QJsonObject jsonObject = doc.object();
+    if (jsonObject.contains("type") && jsonObject["type"].toString() == "GAME_MOVE") {
+        qDebug() << "Processing GAME_MOVE message.";
+
+        QJsonObject dataObject = jsonObject["data"].toObject();
+        if (dataObject.contains("lastMove")) {
+            QJsonObject lastMoveObject = dataObject["lastMove"].toObject();
+            QString winnerID = dataObject["winnerId"].toString();
+            // Extract "status", "x", and "y"
+            int status = lastMoveObject.value("status").toInt();
+            int x = lastMoveObject.value("x").toInt();
+            int y = lastMoveObject.value("y").toInt();
+
+            qDebug() << "Extracted last move details:";
+            qDebug() << "Status:" << status;
+            qDebug() << "X:" << x;
+            qDebug() << "Y:" << y;
+
+            switch (status) {
+            case 1:
+                QMessageBox::information(this, "Move Result", "Ship Missed!");
+                playerBoard[x][y]->setStyleSheet("background-color: grey;"); //
+                break;
+            case 2:
+                QMessageBox::information(this, "Move Result", "Ship Hit!");
+                playerBoard[x][y]->setStyleSheet("background-color: #004C4C;"); // Dark Teal
+                if (!winnerID.isEmpty()) {
+                    QString firstPlayerId = dataObject["firstPlayerId"].toString();
+                    QString secondPlayerId = dataObject["secondPlayerId"].toString();
+                    QString loserId = (winnerID == firstPlayerId) ? secondPlayerId : firstPlayerId;
+
+                    GameResultScreen *resultScreen = dynamic_cast<GameResultScreen *>(stackedWidget->widget(10));
+                    if (resultScreen) {
+                       resultScreen->setResults(winnerID, loserId);
+                    }
+                    resetBoards();
+                    stackedWidget->setCurrentIndex(10);
+                }
+                break;
+            case 3:
+                QMessageBox::information(this, "Move Result", "Ship Destroyed!");
+                playerBoard[x][y]->setStyleSheet("background-color: #004C4C;"); // Existing Blue
+                break;
+            default:
+                QMessageBox::warning(this, "Invalid Status", "Invalid move status!");
+                break;
+            }
+            makeMoveButton->setVisible(true);
+        } else {
+            qWarning() << "No 'lastMove' field found in data!";
+        }
+    } else {
+        qDebug() << "Message type is not GAME_MOVE, ignoring.";
+    }
+}
+
+void GameBoard::resetBoards() {
+    for (int row = 0; row < 10; ++row) {
+        for (int col = 0; col < 10; ++col) {
+            // Reset player board
+            playerBoard[row][col]->setStyleSheet("background-color: lightblue;");
+
+            // Reset opponent board
+            opponentBoard[row][col]->setStyleSheet("background-color: lightblue;");
+            opponentBoard[row][col]->setEnabled(true);
+        }
     }
 }

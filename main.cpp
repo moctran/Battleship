@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QString>
 #include "initialscreen.h"
 #include "loginscreen.h"
 #include "signupscreen.h"
@@ -8,9 +9,11 @@
 #include "historyscreen.h"
 #include "battleshipboard.h"
 #include "gameboard.h"
-#include <QString>
 #include "testScreen.h"
+#include "gameresultscreen.h"
 QString globalUserToken;
+QString globalUserId;
+QString globalUserName;
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -29,6 +32,7 @@ int main(int argc, char *argv[]) {
     BattleshipBoard *setupgameBoard = new BattleshipBoard(&stackedWidget); // Set up board
     GameBoard *gameBoard = new GameBoard(&stackedWidget);
     TestScreen *testScreen = new TestScreen(&stackedWidget);
+    GameResultScreen *gameResult = new GameResultScreen(&stackedWidget);
     // Add screens to the stacked widget
     stackedWidget.addWidget(initialScreen); // Index 0
     stackedWidget.addWidget(loginScreen);   // Index 1
@@ -41,6 +45,7 @@ int main(int argc, char *argv[]) {
     stackedWidget.addWidget(setupgameBoard); // Index 7
     stackedWidget.addWidget(gameBoard); // Index 8
     stackedWidget.addWidget(testScreen); // Index 9
+    stackedWidget.addWidget(gameResult); // Index 10
     stackedWidget.setCurrentWidget(initialScreen);
     stackedWidget.show();
 

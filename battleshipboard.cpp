@@ -1,6 +1,8 @@
 #include "battleshipboard.h"
 #include "gameboard.h"
 extern QString globalUserToken;
+extern QString globalUserId;
+extern QString globalUserName;
 
 // This is a set up board
 // Constructor of a set up board
@@ -40,6 +42,13 @@ BattleshipBoard::BattleshipBoard(QStackedWidget *stackedWidget, QWidget *parent)
     clearButton->setFixedSize(150, 40);
     connect(clearButton, &QPushButton::clicked, this, &BattleshipBoard::onClearButtonClicked);
     centerLayout->addWidget(clearButton, 0, Qt::AlignCenter);
+
+    // Generate Board Button
+    generateBoardButton = new QPushButton("Generate Board", this);
+    generateBoardButton->setFixedSize(150, 40);
+    generateBoardButton->setStyleSheet("font-size: 14px;");
+    connect(generateBoardButton, &QPushButton::clicked, this, &BattleshipBoard::onGenerateBoardButtonClicked);
+    centerLayout->addWidget(generateBoardButton, 0, Qt::AlignCenter);
 
     // Add to main layout
     mainLayout->addLayout(playerContainer);
@@ -335,7 +344,7 @@ void BattleshipBoard::setUpAnnouncement(const QByteArray &message) {
 
 void BattleshipBoard::playGameRedirect(const QByteArray &message) {
     QJsonDocument doc = QJsonDocument::fromJson(message);
-    qDebug() << "Play Game message: ";
+    qDebug() << "Play Game message: " << message;
     if (!doc.isObject()) {
         qWarning() << "Invalid JSON format!";
         return;
@@ -348,11 +357,25 @@ void BattleshipBoard::playGameRedirect(const QByteArray &message) {
         saveBoardState();
         qDebug() << "Game Board Saved.";
 
+        QJsonObject dataObject = jsonObject["data"].toObject();
+        // Extract "firstPlayerId" and "secondPlayerId"
+        QString firstPlayerId = dataObject.value("firstPlayerId").toString();
+        qDebug() << "Local user ID:" << userId;
+        qDebug() << "First Player ID:" << firstPlayerId;
+
+        bool checkFirstPlayer = (firstPlayerId == userId);
+        qDebug() << "Is first player:" << checkFirstPlayer;
+
+        // Extract "isFirstPlayerTurn" as a boolean
+        bool checkFirstPlayerTurn = dataObject.value("isFirstPlayerTurn").toBool();
+        qDebug() << "Is it the first player's turn:" << checkFirstPlayerTurn;
         GameBoard *playgameboard = dynamic_cast<GameBoard *>(stackedWidget->widget(8));
         if (playgameboard) {
             playgameboard->setToken(globalUserToken); // Pass the token dynamically
             playgameboard->setInitialState(savedBoardState);
+            playgameboard->setFirstPlayerStatus(checkFirstPlayer);
             playgameboard->displayInitialState();
+            playgameboard->firstMoveCheck(checkFirstPlayer, checkFirstPlayerTurn);
         }
         stackedWidget->setCurrentIndex(8);
     } else {
@@ -360,4 +383,52 @@ void BattleshipBoard::playGameRedirect(const QByteArray &message) {
     }
 }
 
+void BattleshipBoard::onGenerateBoardButtonClicked() {
+    QJsonObject requestJson;
+    requestJson["type"] = "generate_board";
+    requestJson["token"] = token;
 
+    QByteArray responseData = sendRequest(requestJson, 3000);
+    QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject responseObj = responseDoc.object();
+
+    if (responseObj.contains("data") && responseObj["data"].isArray()) {
+        QJsonArray dataArray = responseObj["data"].toArray();
+
+        qDebug() << "Generated Board:";
+
+        for (int row_num = 0; row_num < dataArray.size(); ++row_num) {
+            QJsonArray row = dataArray[row_num].toArray();
+            QString line;
+
+            for (int col_num = 0; col_num < row.size(); ++col_num) {
+                int cell = row[col_num].toInt();
+                line += QString::number(cell) + " ";
+
+                // Update UI element
+                QString color = getColour(cell); // Custom method to map cell value to a color
+                playerBoard[row_num][col_num]->setStyleSheet("background-color: " + color + ";");
+                playerBoard[row_num][col_num]->setProperty("state", cell);
+            }
+            // Print the row as a formatted line
+            qDebug() << line.trimmed();
+        }
+        // Mark all ship buttons as "placed"
+        for (QPushButton *shipButton : availableShips) {
+            shipButton->setDisabled(true); // Disable ship buttons
+            shipButton->setText("Placed"); // Update button text
+            shipButton->setStyleSheet("background-color: grey; color: white;"); // Style for placed buttons
+        }
+        // Enable the "Finish Setup" button
+        finishSetupButton->setEnabled(true);
+    } else {
+        qDebug() << "Data field missing or not an array";
+    }
+
+    if (responseObj.contains("message")) {
+        qDebug() << "Message:" << responseObj["message"].toString();
+    }
+    if (responseObj.contains("status")) {
+        qDebug() << "Status:" << responseObj["status"].toString();
+    }
+}

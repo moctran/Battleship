@@ -43,6 +43,7 @@ private:
     QPushButton *playerBoard[10][10];
     QPushButton *returnButton;
     QPushButton *finishSetupButton;
+    QPushButton *generateBoardButton;
     QPushButton *clearButton;
     QStackedWidget *stackedWidget;
     QLabel *gameTitle;
@@ -68,6 +69,7 @@ private:
     void onReturnButtonClicked();
     void onFinishSetupClicked();
     void onClearButtonClicked();
+    void onGenerateBoardButtonClicked();
     void submitArrangementToServer();
 };
 

@@ -5,6 +5,7 @@ SOURCES += \
     battleshipboard.cpp \
     creategameroom.cpp \
     gameboard.cpp \
+    gameresultscreen.cpp \
     historyscreen.cpp \
     homescreen.cpp \
     initialscreen.cpp \
@@ -25,6 +26,7 @@ HEADERS += \
     battleshipboard.h \
     creategameroom.h \
     gameboard.h \
+    gameresultscreen.h \
     historyscreen.h \
     homescreen.h \
     initialscreen.h \

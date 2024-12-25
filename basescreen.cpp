@@ -38,3 +38,13 @@ void baseScreen::setToken(const QString &newToken) {
     token = newToken;
     qDebug() << "Token set:" << token;
 }
+
+void baseScreen::setId(const QString &newId) {
+    userId = newId;
+    qDebug() << "User ID set:" << userId;
+}
+
+void baseScreen::setName(const QString &newName) {
+    userName = newName;
+    qDebug() << "User name set:" << userName;
+}
