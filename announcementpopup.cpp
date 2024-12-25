@@ -32,15 +32,22 @@ AnnouncementPopup::~AnnouncementPopup() {
 }
 
 void AnnouncementPopup::showPopup(const QString &messageText) {
-    // Set the message in the label
+    // Set the message text in the label
     messageLabel->setText(messageText);
+    messageLabel->setWordWrap(true); // Enable word wrapping
+    messageLabel->setAlignment(Qt::AlignCenter); // Center-align text
 
-    // Resize the popup dynamically to fit the text
-    QFontMetrics metrics(messageLabel->font());
-    int maxWidth = 1000; // Maximum width for the popup
-    int textWidth = metrics.boundingRect(0, 0, maxWidth, 0, Qt::TextWordWrap, messageText).width() + 20;
-    int textHeight = metrics.boundingRect(0, 0, maxWidth, 0, Qt::TextWordWrap, messageText).height() + 20;
-    setFixedSize(qMin(textWidth, maxWidth), qMin(textHeight, 1000)); // Adjust popup size dynamically
+    // Apply font and styling for better visibility
+    messageLabel->setStyleSheet(
+        "font-size: 24px; font-weight: bold; color: white; "
+        "background-color: rgba(0, 0, 0, 0.7); border-radius: 10px; padding: 20px;"
+        );
+
+    // Set the fixed size of the popup window
+    setFixedSize(800, 600);
+
+    // Manually set the QLabel's geometry to fit within the popup
+    messageLabel->setGeometry(20, 20, 760, 560); // Leave padding of 20px on all sides
 
     // Center the popup on the primary screen
     QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
@@ -63,3 +70,4 @@ void AnnouncementPopup::showPopup(const QString &messageText) {
     // Hide the popup after 3 seconds
     QTimer::singleShot(3000, this, &QWidget::close);
 }
+

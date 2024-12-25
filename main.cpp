@@ -48,6 +48,6 @@ int main(int argc, char *argv[]) {
     stackedWidget.addWidget(gameResult); // Index 10
     stackedWidget.setCurrentWidget(initialScreen);
     stackedWidget.show();
-
+    stackedWidget.setFixedSize(1200, 600); // Fixed size for all screens
     return app.exec();
 }
