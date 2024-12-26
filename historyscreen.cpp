@@ -5,20 +5,27 @@
 #include <QJsonArray>
 #include <QMessageBox>
 #include <QDebug>
+#include <QHeaderView>
 
 HistoryScreen::HistoryScreen(QStackedWidget *stackedWidget, const QString &token, QWidget *parent)
     : baseScreen(parent), stackedWidget(stackedWidget), token(token) {
 
-    summaryLabel = new QLabel(this);
-    historyList = new QListWidget(this);
+    historyTable = new QTableWidget(this);
     backButton = new QPushButton("Back", this);
 
     layout = new QVBoxLayout(this);
-    layout->addWidget(summaryLabel);
-    layout->addWidget(historyList);
+    layout->addWidget(historyTable);
     layout->addWidget(backButton);
 
     setLayout(layout);
+
+    // Configure the table
+    historyTable->setColumnCount(3);
+    historyTable->setHorizontalHeaderLabels({"Match ID", "Winner", "Time"});
+    historyTable->horizontalHeader()->setStretchLastSection(true);
+    historyTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    historyTable->setSelectionMode(QAbstractItemView::NoSelection);
+    historyTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     connect(backButton, &QPushButton::clicked, this, &HistoryScreen::onBackButtonClicked);
 }
@@ -44,7 +51,7 @@ void HistoryScreen::fetchHistory() {
     requestJson["type"] = "view_profile";
     requestJson["token"] = token;
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
 
     qDebug() << "Server response for view_profile:" << responseData;
 
@@ -60,25 +67,24 @@ void HistoryScreen::fetchHistory() {
 }
 
 void HistoryScreen::displayHistory(const QJsonObject &data) {
-    int totalMatches = data["totalMatches"].toInt();
-    int totalWins = data["totalWins"].toInt();
-    double winPercentage = data["winPercentage"].toDouble();
-
-    summaryLabel->setText(QString("Total Matches: %1 | Wins: %2 | Win Percentage: %3%")
-                              .arg(totalMatches)
-                              .arg(totalWins)
-                              .arg(QString::number(winPercentage, 'f', 2)));
+    historyTable->clearContents();
+    historyTable->setRowCount(0);
 
     QJsonArray matches = data["matches"].toArray();
-    historyList->clear();
 
     for (const QJsonValue &matchValue : matches) {
         QJsonObject match = matchValue.toObject();
-        QString matchText = QString("Match ID: %1 | Winner: %2 | Time: %3")
-                                .arg(match["id"].toString())
-                                .arg(match["winnerId"].toString())
-                                .arg(match["timestamp"].toString());
-        historyList->addItem(matchText);
+
+        int row = historyTable->rowCount();
+        historyTable->insertRow(row);
+
+        QTableWidgetItem *matchIdItem = new QTableWidgetItem(match["id"].toString());
+        QTableWidgetItem *winnerItem = new QTableWidgetItem(match["winnerId"].toString());
+        QTableWidgetItem *timeItem = new QTableWidgetItem(match["timestamp"].toString());
+
+        historyTable->setItem(row, 0, matchIdItem);
+        historyTable->setItem(row, 1, winnerItem);
+        historyTable->setItem(row, 2, timeItem);
     }
 }
 

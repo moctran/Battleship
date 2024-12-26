@@ -38,7 +38,7 @@ void JoinGameRoom::onJoinRoomClicked() {
     requestJson["token"] = token;
     requestJson["room_id"] = roomNumber;
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     qDebug() << "Server response for leave_room:" << responseData;
 
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);

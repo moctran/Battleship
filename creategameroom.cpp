@@ -60,7 +60,7 @@ void CreateGameRoom::onStartGameClicked() {
     requestJson["type"] = "prepare_game";
     requestJson["token"] = token; // Ensure globalUserToken is valid
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     qDebug() << responseData;
 
     // Parse the response data
@@ -105,7 +105,7 @@ void CreateGameRoom::populateOnlinePlayers() {
     requestJson["type"] = "online_users";
     requestJson["token"] = token;
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
@@ -181,7 +181,7 @@ void CreateGameRoom::onSendButtonClicked(const QString &userId) {
     requestJson["token"] = token;
     requestJson["user_id"] = userId;
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
 
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
@@ -197,7 +197,7 @@ QString CreateGameRoom::generateRoomID() {
     requestJson["token"] = token;
 
     // Process the response
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     qDebug() << "Server response for create_room:" << responseData;
 
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);

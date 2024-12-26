@@ -3,6 +3,7 @@
 #include "creategameroom.h"
 #include "joingameroom.h"
 #include "SocketManager.h"
+#include "leaderboardscreen.h"
 #include <QMessageBox>
 #include <QDebug>
 #include <QTcpSocket>
@@ -23,7 +24,6 @@ HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     leaderboardButton = new QPushButton("Leaderboard", this);
     historyButton = new QPushButton("History", this);
     logOutButton = new QPushButton("Log Out", this);
-    testButton = new QPushButton("Test", this);
 
     layout = new QVBoxLayout(this);
     layout->addWidget(new QLabel("Home Screen", this));
@@ -32,7 +32,6 @@ HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     layout->addWidget(leaderboardButton);
     layout->addWidget(historyButton);
     layout->addWidget(logOutButton);
-    layout->addWidget(testButton);
     setLayout(layout);
 
     connect(joinGameRoomButton, &QPushButton::clicked, this, &HomeScreen::onJoinGameRoomClicked);
@@ -40,7 +39,6 @@ HomeScreen::HomeScreen(QStackedWidget *stackedWidget, QWidget *parent)
     connect(leaderboardButton, &QPushButton::clicked, this, &HomeScreen::onLeaderboardClicked);
     connect(historyButton, &QPushButton::clicked, this, &HomeScreen::onHistoryClicked);
     connect(logOutButton, &QPushButton::clicked, this, &HomeScreen::onLogOutClicked);
-    connect(testButton, &QPushButton::clicked, this, &HomeScreen::onTestClicked);
 
     // Connect to SocketManager's signal
     SocketManager *socketManager = SocketManager::getInstance();
@@ -81,7 +79,12 @@ void HomeScreen::onCreateGameRoomClicked() {
 }
 
 void HomeScreen::onLeaderboardClicked() {
-    qDebug() << "Leaderboard clicked.";
+    LeaderboardScreen *leaderboardScreen = dynamic_cast<LeaderboardScreen *>(stackedWidget->widget(10)); // Index 10
+    if (leaderboardScreen) {
+        leaderboardScreen->setToken(globalUserToken); // Pass the token dynamically
+        leaderboardScreen->loadLeaderboard();        // Trigger fetching leaderboard
+    }
+    stackedWidget->setCurrentIndex(10); // Navigate to Leaderboard screen
 }
 
 void HomeScreen::onHistoryClicked() {
@@ -103,7 +106,7 @@ void HomeScreen::HandleLoggedOut() {
     requestJson["type"] = "logout";
     requestJson["token"] = globalUserToken;
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
@@ -118,9 +121,7 @@ void HomeScreen::HandleLoggedOut() {
     }
 }
 
-void HomeScreen::onTestClicked() {
-    stackedWidget->setCurrentIndex(9); //
-}
+
 
 void HomeScreen::onInvitationReceived(const QByteArray &message) {
     if (stackedWidget->currentWidget() != this) {
