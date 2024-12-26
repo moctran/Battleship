@@ -256,7 +256,7 @@ void BattleshipBoard::submitArrangementToServer() {
 
     requestJson["ships"] = shipsArray;
     // Read and process the server's response
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
@@ -388,7 +388,7 @@ void BattleshipBoard::onGenerateBoardButtonClicked() {
     requestJson["type"] = "generate_board";
     requestJson["token"] = token;
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 

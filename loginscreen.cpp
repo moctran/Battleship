@@ -48,7 +48,7 @@ void LoginScreen::onLoginButtonClicked() {
     requestJson["username"] = username;
     requestJson["password"] = password;
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 

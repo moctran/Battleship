@@ -18,6 +18,7 @@ public:
     void connectToServer(const QString& host, quint16 port);
     void disconnectFromServer();
     void printSocketInfo() const;
+    void closeConnection();
 
 signals:
     void connectionEstablished();

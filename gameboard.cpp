@@ -153,7 +153,7 @@ void GameBoard::sendMoveRequest(int row, int col) {
     requestJson["x"] = row;
     requestJson["y"] = col;
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 
@@ -204,7 +204,7 @@ void GameBoard::onResignClicked() {
     requestJson["type"] = "resign_game";
     requestJson["token"] = token;
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 

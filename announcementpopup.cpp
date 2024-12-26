@@ -68,6 +68,6 @@ void AnnouncementPopup::showPopup(const QString &messageText) {
     show();
 
     // Hide the popup after 3 seconds
-    QTimer::singleShot(3000, this, &QWidget::close);
+    QTimer::singleShot(60000, this, &QWidget::close);
 }
 

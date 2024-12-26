@@ -32,19 +32,22 @@ void SocketManager::connectToServer(const QString& host, quint16 port) {
     if (socket->state() == QTcpSocket::UnconnectedState) {
         socket->connectToHost(host, port);
         // Wait for connection
-        if (!socket->waitForConnected(60000)) { // 5000 ms timeout
+        if (!socket->waitForConnected(600000)) { // 600 seconds timeout
             qDebug() << "Failed to connect to server:" << socket->errorString();
             emit errorOccurred("Failed to connect to server: " + socket->errorString());
         } else {
             qDebug() << "Successfully connected to server.";
         }
     }
-
 }
 
-void SocketManager::disconnectFromServer() {
+void SocketManager::closeConnection() {
     if (socket->state() != QTcpSocket::UnconnectedState) {
-        socket->disconnectFromHost();
+        qDebug() << "Closing socket connection...";
+        socket->close();
+        qDebug() << "Socket connection closed.";
+    } else {
+        qDebug() << "Socket is already in an unconnected state.";
     }
 }
 
@@ -59,6 +62,7 @@ void SocketManager::onDisconnected() {
 }
 
 void SocketManager::onError(QAbstractSocket::SocketError socketError) {
+    Q_UNUSED(socketError)
     qDebug() << "Socket error:" << socket->errorString();
     emit errorOccurred(socket->errorString());
 }
@@ -94,4 +98,3 @@ void SocketManager::printSocketInfo() const {
         qDebug() << "  Last Error: None";
     }
 }
-
