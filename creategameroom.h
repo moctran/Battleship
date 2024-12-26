@@ -30,6 +30,7 @@ public:
     void displayOnlinePlayers(std::vector<Player>& players);
     void updateLabels(const QString player1Name, const QString player2Name);
     void sendJoinRoomRequest(const QString &invitedRoomId);
+    void refreshPlayerList();
 private slots:
     void onStartGameClicked();
     void onBackClicked();
@@ -44,6 +45,7 @@ private:
     QLabel *player2Label;
     QPushButton *startGameButton;
     QPushButton *backButton;
+    QPushButton *refreshButton;
     QLabel *roomIDLabel;
     QListWidget *onlinePlayersList;
     QVBoxLayout *mainLayout;

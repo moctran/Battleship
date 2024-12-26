@@ -42,7 +42,7 @@ void SignUpScreen::onSignUpButtonClicked() {
     // QTcpSocket socket;
     // socket.connectToHost("127.0.0.1", 8080);
 
-    // if (!socket.waitForConnected(3000)) {
+    // if (!socket.waitForConnected(60000)) {
     //     QMessageBox::critical(this, "Connection Error", "Failed to connect to the server.");
     //     return;
     // }
@@ -57,17 +57,17 @@ void SignUpScreen::onSignUpButtonClicked() {
     // QByteArray data = doc.toJson();
     // socket.write(data);
 
-    // if (!socket.waitForBytesWritten(3000)) {
+    // if (!socket.waitForBytesWritten(60000)) {
     //     QMessageBox::critical(this, "Error", "Failed to send data to the server.");
     //     return;
     // }
 
-    // if (!socket.waitForReadyRead(3000)) {
+    // if (!socket.waitForReadyRead(60000)) {
     //     QMessageBox::critical(this, "Error", "No response from the server.");
     //     return;
     // }
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
     QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
     QJsonObject responseObj = responseDoc.object();
 

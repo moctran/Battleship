@@ -44,7 +44,7 @@ void HistoryScreen::fetchHistory() {
     requestJson["type"] = "view_profile";
     requestJson["token"] = token;
 
-    QByteArray responseData = sendRequest(requestJson, 3000);
+    QByteArray responseData = sendRequest(requestJson, 60000);
 
     qDebug() << "Server response for view_profile:" << responseData;
 
