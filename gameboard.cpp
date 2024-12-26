@@ -316,6 +316,19 @@ void GameBoard::onMoveReceived(const QByteArray &message) {
             case 2:
                 QMessageBox::information(this, "Move Result", "Ship Hit!");
                 playerBoard[x][y]->setStyleSheet("background-color: #004C4C;"); // Dark Teal
+
+                if (!winnerID.isEmpty()) {
+                    QString firstPlayerId = dataObject["firstPlayerId"].toString();
+                    QString secondPlayerId = dataObject["secondPlayerId"].toString();
+                    QString loserId = (winnerID == firstPlayerId) ? secondPlayerId : firstPlayerId;
+
+                    GameResultScreen *resultScreen = dynamic_cast<GameResultScreen *>(stackedWidget->widget(10));
+                    if (resultScreen) {
+                       resultScreen->setResults(winnerID, loserId);
+                    }
+                    resetBoards();
+                    stackedWidget->setCurrentIndex(9);
+                }
                 break;
             case 3:
                 QMessageBox::information(this, "Move Result", "Ship Destroyed!");

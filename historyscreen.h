@@ -1,37 +1,32 @@
 #ifndef HISTORYSCREEN_H
 #define HISTORYSCREEN_H
 
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QListWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QStackedWidget>
-#include <QTcpSocket>
 #include "basescreen.h"
+#include <QStackedWidget>
+#include <QTableWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 class HistoryScreen : public baseScreen {
     Q_OBJECT
 
 public:
-    explicit HistoryScreen(QStackedWidget *stackedWidget, const QString &token, QWidget *parent = nullptr);
-
-    void setToken(const QString &newToken); // Set token dynamically
-    void loadHistory();                     // Trigger fetching history
+    explicit HistoryScreen(QStackedWidget *stackedWidget, const QString &token = "", QWidget *parent = nullptr);
+    void setToken(const QString &newToken);
+    void loadHistory();
 
 private slots:
-    void fetchHistory();
     void onBackButtonClicked();
 
 private:
-    QVBoxLayout *layout;
-    QLabel *summaryLabel;
-    QListWidget *historyList;
-    QPushButton *backButton;
+    void fetchHistory();
+    void displayHistory(const QJsonObject &data);
+
     QStackedWidget *stackedWidget;
     QString token;
-
-    void displayHistory(const QJsonObject &data);
+    QTableWidget *historyTable;
+    QPushButton *backButton;
+    QVBoxLayout *layout;
 };
 
 #endif // HISTORYSCREEN_H

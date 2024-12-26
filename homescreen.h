@@ -20,7 +20,6 @@ private slots:
     void onLeaderboardClicked();
     void onHistoryClicked();
     void onLogOutClicked();
-    void onTestClicked();
     void HandleLoggedOut();
     void onInvitationReceived(const QByteArray &message); // Slot
 
@@ -30,7 +29,6 @@ private:
     QPushButton *leaderboardButton;
     QPushButton *historyButton;
     QPushButton *logOutButton;
-    QPushButton *testButton;
     QVBoxLayout *layout;
     QStackedWidget *stackedWidget;
 };

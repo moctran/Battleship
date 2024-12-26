@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QStackedWidget>
+#include <QLabel>
 #include "loginscreen.h"
 #include "signupscreen.h"
 

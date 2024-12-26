@@ -10,11 +10,11 @@ SOURCES += \
     homescreen.cpp \
     initialscreen.cpp \
     joingameroom.cpp \
+    leaderboardscreen.cpp \
     loginscreen.cpp \
     main.cpp \
     signupscreen.cpp \
-    socketmanager.cpp \
-    testScreen.cpp
+    socketmanager.cpp
 QT += widgets
 QT += network
 QT += core gui widgets
@@ -31,7 +31,7 @@ HEADERS += \
     homescreen.h \
     initialscreen.h \
     joingameroom.h \
+    leaderboardscreen.h \
     loginscreen.h \
     signupscreen.h \
-    socketmanager.h \
-    testScreen.h
+    socketmanager.h

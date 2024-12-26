@@ -1,12 +1,12 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'historyscreen.h'
+** Meta object code from reading C++ file 'leaderboardscreen.h'
 **
 ** Created by: The Qt Meta Object Compiler version 68 (Qt 6.8.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../historyscreen.h"
+#include "../../leaderboardscreen.h"
 #include <QtCore/qmetatype.h>
 
 #include <QtCore/qtmochelpers.h>
@@ -16,7 +16,7 @@
 
 #include <QtCore/qxptype_traits.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'historyscreen.h' doesn't include <QObject>."
+#error "The header file 'leaderboardscreen.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 68
 #error "This file was generated using the moc from 6.8.0. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -33,9 +33,9 @@ QT_WARNING_DISABLE_GCC("-Wuseless-cast")
 namespace {
 
 #ifdef QT_MOC_HAS_STRINGDATA
-struct qt_meta_stringdata_CLASSHistoryScreenENDCLASS_t {};
-constexpr auto qt_meta_stringdata_CLASSHistoryScreenENDCLASS = QtMocHelpers::stringData(
-    "HistoryScreen",
+struct qt_meta_stringdata_CLASSLeaderboardScreenENDCLASS_t {};
+constexpr auto qt_meta_stringdata_CLASSLeaderboardScreenENDCLASS = QtMocHelpers::stringData(
+    "LeaderboardScreen",
     "onBackButtonClicked",
     ""
 );
@@ -44,7 +44,7 @@ constexpr auto qt_meta_stringdata_CLASSHistoryScreenENDCLASS = QtMocHelpers::str
 #endif // !QT_MOC_HAS_STRINGDATA
 } // unnamed namespace
 
-Q_CONSTINIT static const uint qt_meta_data_CLASSHistoryScreenENDCLASS[] = {
+Q_CONSTINIT static const uint qt_meta_data_CLASSLeaderboardScreenENDCLASS[] = {
 
  // content:
       12,       // revision
@@ -66,25 +66,25 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSHistoryScreenENDCLASS[] = {
        0        // eod
 };
 
-Q_CONSTINIT const QMetaObject HistoryScreen::staticMetaObject = { {
+Q_CONSTINIT const QMetaObject LeaderboardScreen::staticMetaObject = { {
     QMetaObject::SuperData::link<baseScreen::staticMetaObject>(),
-    qt_meta_stringdata_CLASSHistoryScreenENDCLASS.offsetsAndSizes,
-    qt_meta_data_CLASSHistoryScreenENDCLASS,
+    qt_meta_stringdata_CLASSLeaderboardScreenENDCLASS.offsetsAndSizes,
+    qt_meta_data_CLASSLeaderboardScreenENDCLASS,
     qt_static_metacall,
     nullptr,
-    qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSHistoryScreenENDCLASS_t,
+    qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSLeaderboardScreenENDCLASS_t,
         // Q_OBJECT / Q_GADGET
-        QtPrivate::TypeAndForceComplete<HistoryScreen, std::true_type>,
+        QtPrivate::TypeAndForceComplete<LeaderboardScreen, std::true_type>,
         // method 'onBackButtonClicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
     nullptr
 } };
 
-void HistoryScreen::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void LeaderboardScreen::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        auto *_t = static_cast<HistoryScreen *>(_o);
+        auto *_t = static_cast<LeaderboardScreen *>(_o);
         (void)_t;
         switch (_id) {
         case 0: _t->onBackButtonClicked(); break;
@@ -94,20 +94,20 @@ void HistoryScreen::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
     (void)_a;
 }
 
-const QMetaObject *HistoryScreen::metaObject() const
+const QMetaObject *LeaderboardScreen::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *HistoryScreen::qt_metacast(const char *_clname)
+void *LeaderboardScreen::qt_metacast(const char *_clname)
 {
     if (!_clname) return nullptr;
-    if (!strcmp(_clname, qt_meta_stringdata_CLASSHistoryScreenENDCLASS.stringdata0))
+    if (!strcmp(_clname, qt_meta_stringdata_CLASSLeaderboardScreenENDCLASS.stringdata0))
         return static_cast<void*>(this);
     return baseScreen::qt_metacast(_clname);
 }
 
-int HistoryScreen::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int LeaderboardScreen::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = baseScreen::qt_metacall(_c, _id, _a);
     if (_id < 0)
