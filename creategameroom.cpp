@@ -19,6 +19,7 @@ CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     player2Label = new QLabel("Opponent Name (hardcoded)", this);
     startGameButton = new QPushButton("Start Game", this);
     backButton = new QPushButton("Back", this);
+    refreshButton = new QPushButton("Refresh", this);
 
     QVBoxLayout *leftLayout = new QVBoxLayout();
     leftLayout->addWidget(new QLabel("Players", this));
@@ -36,6 +37,7 @@ CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     QVBoxLayout *rightLayout = new QVBoxLayout();
     rightLayout->addWidget(roomIDLabel);
     rightLayout->addWidget(new QLabel("Online Players", this));
+    rightLayout->addWidget(refreshButton);
     rightLayout->addWidget(onlinePlayersList);
 
     // Combine left and right side
@@ -48,6 +50,7 @@ CreateGameRoom::CreateGameRoom(QStackedWidget *stackedWidget, QWidget *parent)
     // Connect buttons
     connect(startGameButton, &QPushButton::clicked, this, &CreateGameRoom::onStartGameClicked);
     connect(backButton, &QPushButton::clicked, this, &CreateGameRoom::onBackClicked);
+    connect(refreshButton, &QPushButton::clicked, this, &CreateGameRoom::populateOnlinePlayers);
     SocketManager* socketManager = SocketManager::getInstance();
     connect(socketManager, &SocketManager::messageReceived, this, &CreateGameRoom::onPlayerChanges);
     connect(socketManager, &SocketManager::messageReceived, this, &CreateGameRoom::onSetUpRedirect);
@@ -253,11 +256,13 @@ void CreateGameRoom::onPlayerChanges(const QByteArray &message) {
         } else {
             qWarning() << "'data' not found or is not an object!";
         }
-
         // Display the "message" part in a message box
         if (jsonObject.contains("message")) {
             QString messageText = jsonObject["message"].toString();
             QMessageBox::information(this, "Room Players Change", messageText);
+            if (messageText.contains("disconnect", Qt::CaseInsensitive)) {
+                stackedWidget->setCurrentIndex(5);
+            }
         } else {
             qWarning() << "'message' not found in JSON!";
         }

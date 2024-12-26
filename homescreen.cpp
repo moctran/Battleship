@@ -114,6 +114,9 @@ void HomeScreen::HandleLoggedOut() {
 
     if (responseObj["status"].toString() == "success") {
         QMessageBox::information(this, "Logout Successful", "You have logged out from the game.");
+        //Close connection to server
+        SocketManager* socketManager = SocketManager::getInstance();
+        socketManager->closeConnection();
         stackedWidget->setCurrentIndex(0); // Navigate back to Initial Screen
     } else {
         QString errorMessage = responseObj["message"].toString();

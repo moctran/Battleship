@@ -111,12 +111,12 @@ void GameBoard::onOpponentBlockClicked() {
 
     // Revert the color of the previously selected block
     if (selectedBlock) {
-        selectedBlock->setStyleSheet("background-color: lightblue; border: 1px solid gray;");
+        selectedBlock->setStyleSheet("background-color: lightblue;");
     }
 
     // Highlight the clicked block
     selectedBlock = clickedBlock;
-    selectedBlock->setStyleSheet("background-color: darkblue; border: 2px solid black;");
+    selectedBlock->setStyleSheet("background-color: darkblue;");
 
     // Enable the Make Move button
     makeMoveButton->setEnabled(true);
@@ -137,7 +137,7 @@ void GameBoard::onMakeMoveClicked() {
 
     // Disable the selected block visually
     selectedBlock->setEnabled(false);
-    selectedBlock->setStyleSheet("background-color: gray; border: 1px solid black;");
+    selectedBlock->setStyleSheet("background-color: gray;");
 
     // Send the move request to the server
     sendMoveRequest(row, col);
@@ -161,11 +161,24 @@ void GameBoard::sendMoveRequest(int row, int col) {
     QString message = responseObj["message"].toString();
 
     if (status == "success") {
-        QMessageBox::information(this, "Make a move", message);
         makeMoveButton->setVisible(false);
-
         QJsonObject dataObject = responseObj["data"].toObject();
         QString winnerID = dataObject["winnerId"].toString();
+        QJsonObject lastMoveObject = dataObject["lastMove"].toObject();
+        int status = lastMoveObject.value("status").toInt();
+        QString finalMessage = message; // Start with the initial message
+        switch (status) {
+        case 1:
+            finalMessage += "-Result: Ship Missed!"; // Append message for "missed"
+            break;
+        case 2:
+            finalMessage += "-Result: Ship Hit!"; // Append message for "hit"
+            break;
+        case 3:
+            finalMessage += "-Result: Ship Destroyed!"; // Append message for "destroyed"
+            break;
+        }
+        QMessageBox::information(this, "Move Result", finalMessage);
         if (!winnerID.isEmpty()) {
             QString firstPlayerId = dataObject["firstPlayerId"].toString();
             QString secondPlayerId = dataObject["secondPlayerId"].toString();
@@ -255,7 +268,7 @@ void GameBoard::displayInitialState() {
             line += QString::number(cell) + " ";
             QString colour = getColour(cell);  // Get the color from the method
             playerBoard[row_num][col_num]->setStyleSheet("background-color: " + colour + ";");
-            opponentBoard[row_num][col_num]->setStyleSheet("background-colour: lightblue");
+            opponentBoard[row_num][col_num]->setStyleSheet("background-color: lightblue");
             col_num += 1;
         }
         row_num += 1;
@@ -303,6 +316,7 @@ void GameBoard::onMoveReceived(const QByteArray &message) {
             case 2:
                 QMessageBox::information(this, "Move Result", "Ship Hit!");
                 playerBoard[x][y]->setStyleSheet("background-color: #004C4C;"); // Dark Teal
+
                 if (!winnerID.isEmpty()) {
                     QString firstPlayerId = dataObject["firstPlayerId"].toString();
                     QString secondPlayerId = dataObject["secondPlayerId"].toString();
@@ -318,11 +332,23 @@ void GameBoard::onMoveReceived(const QByteArray &message) {
                 break;
             case 3:
                 QMessageBox::information(this, "Move Result", "Ship Destroyed!");
-                playerBoard[x][y]->setStyleSheet("background-color: #004C4C;"); // Existing Blue
+                playerBoard[x][y]->setStyleSheet("background-color: #004C4C;");
                 break;
             default:
                 QMessageBox::warning(this, "Invalid Status", "Invalid move status!");
                 break;
+            }
+            if (!winnerID.isEmpty()) {
+                QString firstPlayerId = dataObject["firstPlayerId"].toString();
+                QString secondPlayerId = dataObject["secondPlayerId"].toString();
+                QString loserId = (winnerID == firstPlayerId) ? secondPlayerId : firstPlayerId;
+
+                GameResultScreen *resultScreen = dynamic_cast<GameResultScreen *>(stackedWidget->widget(10));
+                if (resultScreen) {
+                    resultScreen->setResults(winnerID, loserId);
+                }
+                resetBoards();
+                stackedWidget->setCurrentIndex(10);
             }
             makeMoveButton->setVisible(true);
         } else {
@@ -338,7 +364,6 @@ void GameBoard::resetBoards() {
         for (int col = 0; col < 10; ++col) {
             // Reset player board
             playerBoard[row][col]->setStyleSheet("background-color: lightblue;");
-
             // Reset opponent board
             opponentBoard[row][col]->setStyleSheet("background-color: lightblue;");
             opponentBoard[row][col]->setEnabled(true);
