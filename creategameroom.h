@@ -24,6 +24,7 @@ public:
     struct Player {
         QString id;
         QString username;
+        int elo;
     };
     void onSendButtonClicked(const QString &userId);
     void populateOnlinePlayers(); // Function to populate online players list
