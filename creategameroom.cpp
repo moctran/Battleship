@@ -72,7 +72,7 @@ void CreateGameRoom::onStartGameClicked() {
     qDebug() << responseObj["status"];
     // Check if the status is error
     if (responseObj["status"].toString() == "error") {
-        // Display the error message
+        // Display the error mcfessage
         QString errorMessage = responseObj["message"].toString();
         QMessageBox::critical(this, "Game preparation", errorMessage);
     } else {
@@ -127,8 +127,9 @@ void CreateGameRoom::populateOnlinePlayers() {
             Player player;
             player.id = playerObj["id"].toString();
             player.username = playerObj["username"].toString();
+            player.elo = playerObj["elo"].toInt();
             players.push_back(player);
-            qDebug() << player.id << " " << player.username;
+            qDebug() << player.id << " " << player.username << " " << player.elo;
         }
         displayOnlinePlayers(players); // Hiển thị danh sách người chơi online
     } else {
@@ -144,11 +145,12 @@ void CreateGameRoom::displayOnlinePlayers(std::vector<Player>& players) {
         QHBoxLayout *itemLayout = new QHBoxLayout(itemWidget);
 
         // Create the player name label
-        QLabel *playerLabel = new QLabel(player.username, itemWidget);
-
+        QLabel *playerLabel = new QLabel(
+            "Username: " + player.username + " Elo: " + QString::number(player.elo),
+            itemWidget
+            );
         // Set a minimum height for the label to ensure text is not cut off
         playerLabel->setMinimumHeight(30);
-
         // Create the "Send" button
         QPushButton *sendButton = new QPushButton("Send Request", itemWidget);
 
