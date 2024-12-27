@@ -185,12 +185,12 @@ void GameBoard::sendMoveRequest(int row, int col) {
             QString loserId = (winnerID == firstPlayerId) ? secondPlayerId : firstPlayerId;
 
             qDebug() << winnerID << loserId;
-            GameResultScreen *resultScreen = dynamic_cast<GameResultScreen *>(stackedWidget->widget(10));
+            GameResultScreen *resultScreen = dynamic_cast<GameResultScreen *>(stackedWidget->widget(9));
             if (resultScreen) {
                 resultScreen->setResults(winnerID, loserId);
             }
             resetBoards();
-            stackedWidget->setCurrentIndex(10);
+            stackedWidget->setCurrentIndex(9);
         }
     } else {
         QMessageBox::critical(this, "Error", message);
@@ -343,12 +343,12 @@ void GameBoard::onMoveReceived(const QByteArray &message) {
                 QString secondPlayerId = dataObject["secondPlayerId"].toString();
                 QString loserId = (winnerID == firstPlayerId) ? secondPlayerId : firstPlayerId;
 
-                GameResultScreen *resultScreen = dynamic_cast<GameResultScreen *>(stackedWidget->widget(10));
+                GameResultScreen *resultScreen = dynamic_cast<GameResultScreen *>(stackedWidget->widget(9));
                 if (resultScreen) {
                     resultScreen->setResults(winnerID, loserId);
                 }
                 resetBoards();
-                stackedWidget->setCurrentIndex(10);
+                stackedWidget->setCurrentIndex(9);
             }
             makeMoveButton->setVisible(true);
         } else {

@@ -6,7 +6,7 @@ baseScreen::baseScreen(QWidget *parent)
 
 QByteArray baseScreen::sendRequest(const QJsonObject &requestData, int timeout) {
     QTcpSocket tempSocket;
-    tempSocket.connectToHost("127.0.0.1", 8080);
+    tempSocket.connectToHost("172.16.183.145", 8080);
 
     if (!tempSocket.waitForConnected(timeout)) {
         qDebug() << "Failed to connect to the server.";

@@ -72,7 +72,7 @@ void LoginScreen::onLoginButtonClicked() {
 
     // Call the "subscribe_notification" API using SocketManager
     SocketManager* socketManager = SocketManager::getInstance();
-    socketManager->connectToServer("127.0.0.1", 8080); // Ensure connection is established
+    socketManager->connectToServer("172.16.183.145", 8080); // Ensure connection is established
 
     QJsonObject subscribeJson;
     subscribeJson["type"] = "subcribe_notification";
