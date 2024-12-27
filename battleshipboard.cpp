@@ -375,6 +375,7 @@ void BattleshipBoard::playGameRedirect(const QByteArray &message) {
             playgameboard->setInitialState(savedBoardState);
             playgameboard->setFirstPlayerStatus(checkFirstPlayer);
             playgameboard->displayInitialState();
+            resetBoardState();
             playgameboard->firstMoveCheck(checkFirstPlayer, checkFirstPlayerTurn);
         }
         stackedWidget->setCurrentIndex(8);
