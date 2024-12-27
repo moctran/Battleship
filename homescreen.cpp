@@ -201,7 +201,11 @@ void HomeScreen::onInvitationReceived(const QByteArray &message) {
                 }
 
                 QJsonObject responseObj = responseDoc.object();
+                QJsonObject responseDataObj = responseObj["data"].toObject();
                 qDebug() << "Server response for join_room: " << response;
+                QString _firstPlayerId = responseDataObj["firstPlayerId"].toString();
+                QString _secondPlayerId = responseDataObj["secondPlayerId"].toString();
+                qDebug() << _firstPlayerId << " " << _secondPlayerId;
 
                 if (responseObj["status"].toString() == "success") {
                     qDebug() << "Successfully joined the room. Navigating to CreateGameRoom screen.";
@@ -214,7 +218,7 @@ void HomeScreen::onInvitationReceived(const QByteArray &message) {
                         createGameRoom->setRoomID(roomId);
 
                         // Update labels dynamically (using IDs from the message)
-                        createGameRoom->updateLabels(firstPlayerId, secondPlayerId);
+                        createGameRoom->updateLabels(_firstPlayerId, _secondPlayerId);
 
                         // Populate online players
                         createGameRoom->populateOnlinePlayers();
